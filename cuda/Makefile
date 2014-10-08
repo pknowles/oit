@@ -34,7 +34,7 @@ NV_CFLAGS= $(ALL_CFLAGS) -I$(CUDA_HOME)/samples/common/inc -I/home/pknowles/NVID
 # -arch=sm_35
 NV_LFLAGS= -lcuda -lcudpp -shared
 # -lcudadevrt
-SUBLIBS= ../../pyarlib/pyarlib$(ASFX).a ../../lfb/liblfb$(ASFX).a
+SUBLIBS= ../../pyarlib/pyarlib$(ASFX).a
 OBJECTS= ./interface.o ./oit.o
 
 all: pyarlibpyarliba $(TARGET)
