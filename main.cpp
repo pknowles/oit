@@ -55,6 +55,7 @@ const char* sceneFiles[] = {
 	"scenes/powerplant.xml",
 	"scenes/hairball.xml",
 	"scenes/tree.xml",
+	"scenes/spheres.xml",
 	};
 
 bool directionalLight = true;
@@ -257,6 +258,7 @@ void update(float dt)
 	if (jeltz.buttonDown("3")) changeScene(sceneFiles[2]);
 	if (jeltz.buttonDown("4")) changeScene(sceneFiles[3]);
 	if (jeltz.buttonDown("5")) changeScene(sceneFiles[4]);
+	if (jeltz.buttonDown("6")) changeScene(sceneFiles[5]);
 	
 	if (jeltz.resized() /* && !benchmark.running */)
 	{
@@ -506,7 +508,7 @@ int main(int argc, char* argv[])
 	
 	scene.forceDoubleSided = true;
 	scene.setCamera(&fly.camera);
-	scene.load(sceneFiles[1]);
+	scene.load(sceneFiles[5]);
 	scene.enableLighting(false);
 	viewSlider.i = 0;
 	viewSlider.upper = mymax(0, scene.getNumViews() - 1);

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<scene>
+	<mesh name="sphere">
+		<gen type="sphere" dimx="16" dimy="8" />
+		<material colour="1 1 1 0.3" />
+	</mesh>
+	<object mesh="sphere" resize-cover="0 10 0" position="4 0 0"/>
+	<object mesh="sphere" resize-cover="0 10 0" position="-4 0 0"/>
+	<object mesh="sphere" resize-cover="0 10 0"/>
+</scene>
