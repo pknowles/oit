@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<benchmark>
+	
+	globaldefault: 123
+	
+	<warmup time="10.0 11.5" frames="400 500" />
+	<duration time="10.0 11.0" frames="400 500" />
+	
+	<test name="base">
+		enumeration: one, two
+		<sync>
+			sinca: 0, 1, 2
+			sincb: 10, 11, 12
+		</sync>
+		testdefault: 456
+		iteration: 0:20:5
+		<warmup time="0.0 1.5" frames="4 5" />
+		<duration time="0.0 1.0" frames="4 5" />
+	</test>
+	
+	another-globaldefault: 123
+</benchmark>

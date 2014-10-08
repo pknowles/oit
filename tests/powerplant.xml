@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<benchmark>
+	
+	max: 64
+	
+	PACK: 1
+	TILES: 0
+	BMA: 0
+	PRESORT: 0
+	MERGESORT: 0
+	REGISTERSORT: 0
+	BSLMEM: 0
+	BSGMEM: 0
+	BSBASE: 0
+	CUDA: 0
+	SHAREDSORT: 0
+	
+	<warmup time="2.0 2.5" frames="2 100" />
+	<duration time="3.0 4.0" frames="5 100" />
+	
+	<test name="bma">
+	max: 512, 256
+	scene: powerplant
+	view: 0, 1, 2
+	MERGESORT: 0, 1
+	BSLMEM: 0, 1
+	BMA: 0, 1
+	</test>
+	<test name="cuda">
+	max: 512, 256
+	scene: powerplant
+	view: 0, 1, 2
+	MERGESORT: 0, 1
+	BSLMEM: 0, 1
+	CUDA: 0, 1
+	</test>
+</benchmark>

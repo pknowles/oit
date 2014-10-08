@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<benchmark>
+	
+	max: 64
+	
+	numLayers: 32
+	
+	PACK: 1
+	TILES: 0
+	BMA: 0
+	PRESORT: 0
+	MERGESORT: 0
+	REGISTERSORT: 0
+	BSLMEM: 0
+	BSGMEM: 0
+	BSBASE: 0
+	CUDA: 0
+	SHAREDSORT: 0
+	
+	<warmup time="2.0 2.5" frames="2 100" />
+	<duration time="3.0 4.0" frames="5 100" />
+	
+	<test name="baseline">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	</test>
+	<test name="merge">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	MERGESORT: 1
+	</test>
+	<test name="registeronly">
+	max: 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	REGISTERSORT: 1
+	</test>
+	<test name="blocksort">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	BSLMEM: 1
+	</test>
+	<test name="blocksortgmem">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	PACK: 1
+	BSGMEM: 1
+	</test>
+	<test name="bmaonly">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	BMA: 1
+	</test>
+	<test name="bmamerge">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	BMA: 1
+	MERGESORT: 1
+	</test>
+	<test name="bmablocksort">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	BMA: 1
+	BSLMEM: 1
+	</test>
+	<test name="cuda">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	CUDA: 1
+	</test>
+	<test name="cudamerge">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	CUDA: 1
+	MERGESORT: 1
+	</test>
+	<test name="cudablocksort">
+	max: 512, 256, 128, 64, 32, 16, 8
+	scene: planes, atrium, hairball, powerplant
+	CUDA: 1
+	BSLMEM: 1
+	</test>
+</benchmark>

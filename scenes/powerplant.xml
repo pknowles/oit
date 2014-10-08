@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<scene>
+	<mesh name="powerplant">
+		<file src="powerplant/powerplant.ctm"/>
+	</mesh>
+	<object mesh="powerplant" resize-cover="10 10 10"/>
+	<view name="front-dcpeak">
+	-1.69015 -1.20103 -0.523472
+	0.00529851 1.57518 0
+	1.29702
+	</view>
+	<view name="side-dchigh-266">
+	-1.62636 -0.91137 -1.44108
+	0 3.1416 0
+	0
+	</view>
+	<view name="side-dchigh-250">
+	-1.62701 -0.91322 -1.44108
+	0 -3.14159 0
+	0
+	</view>
+	<view name="side-dchigh-422">
+	-1.62211 -0.90322 -1.44108
+	0 -3.14159 0
+	0
+	</view>
+	<view name="distant-dclow">
+	-1.94896 -1.48723 1.12728
+	0.0261805 -0.410143 0
+	0.00451886
+	</view>
+	<view name="inside-dc180m">
+	-1.63508 -1.00453 -0.584216
+	-1.57067 0.00700268 0
+	0.0313939
+	</view>
+</scene>

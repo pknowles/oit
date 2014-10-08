@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<benchmark>
+	
+	max: 64
+	
+	numLayers: 32
+	
+	view: 0
+	
+	PACK: 1
+	TILES: 0
+	BMA: 0
+	PRESORT: 0
+	MERGESORT: 0
+	REGISTERSORT: 0
+	BSLMEM: 0
+	BSGMEM: 0
+	BSBASE: 0
+	CUDA: 0
+	SHAREDSORT: 0
+	
+	<warmup time="2.0 2.5" frames="2 100" />
+	<duration time="3.0 4.0" frames="5 100" />
+	
+	<test name="planes-bma-merge">
+	max: 128
+	scene: planes
+	view: 0, 1
+	BMA: 1
+	MERGESORT: 1
+	</test>
+	<test name="planes-bma-REM-L">
+	max: 128
+	scene: planes
+	view: 0, 1
+	BMA: 1
+	BSLMEM: 0
+	</test>
+	<test name="hairball-bma-merge">
+	max: 256
+	scene: hairball
+	view: 0, 1
+	BMA: 1
+	MERGESORT: 1
+	</test>
+	<test name="hairball-bma-REM-L">
+	max: 256
+	scene: hairball
+	view: 0, 1
+	BMA: 1
+	BSLMEM: 0
+	</test>
+</benchmark>

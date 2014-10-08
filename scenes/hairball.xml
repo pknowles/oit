@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<scene>
+	<mesh name="hairball">
+		<file src="hairball.ctm"/>
+	</mesh>
+	<object mesh="hairball" resize-cover="0 10 0"/>
+	<view name="inside-front">
+	0 0 0
+	0 0 0
+	3
+	</view>
+	<view name="inside-back">
+	0 0 0
+	0 3.14159265359 0
+	3
+	</view>
+	<view name="front">
+	0 0 0
+	0 0 0
+	10
+	</view>
+	<view name="back">
+	0 0 0
+	0 3.14159265359 0
+	10
+	</view>
+	<flythrough speed="10fps">
+		<key position="0 0 0" rotation="0 0 0" zoom="5" frames="4"/>
+		<key position="0 0 0" rotation="0 1.5708 0" zoom="5" frames="4"/>
+		<key position="0 0 0" rotation="0 3.1416 0" zoom="5" frames="4"/>
+		<key position="0 0 0" rotation="0 4.7124 0" zoom="5" frames="4"/>
+		<key position="0 0 0" rotation="0 6.2832 0" zoom="5" frames="4"/>
+	</flythrough>
+</scene>

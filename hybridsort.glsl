@@ -1,0 +1,867 @@
+
+#define MAX_REGISTERS 32
+	
+LFB_FRAG_TYPE registers[MAX_REGISTERS];
+	
+#if MAX_FRAGS > MAX_REGISTERS
+#define MERGE_SIZE (MAX_FRAGS / MAX_REGISTERS)
+#else
+#define MERGE_SIZE 1
+#endif
+
+#define BLOCKSORT_LMEM 0
+#define BLOCKSORT_GMEM 0
+#define BLOCKSORT_BASE 0
+
+#if BLOCKSORT_LMEM
+
+#if 1
+
+//count MUST be less than MAX_REGISTERS
+void registerSortRange(int offset, int count)
+{
+	#pragma optionNV(unroll all)
+	
+	//load from lmem
+	for (int i = 0; i < MAX_REGISTERS; ++i)
+		if (i < count)
+			registers[i] = frags[offset+i];
+
+	//sort in registers
+	LFB_FRAG_TYPE tmp;
+	#define SWAP_FRAGS(a, b) {tmp = a; a = b; b = tmp;}
+	#define CSWAP(a, b) \
+		if (LFB_FRAG_DEPTH(a) > LFB_FRAG_DEPTH(b)) SWAP_FRAGS(a, b);
+	#define CSWAP_I(i, j) \
+		if (LFB_FRAG_DEPTH(registers[i]) > LFB_FRAG_DEPTH(registers[j])) SWAP_FRAGS(registers[i], registers[j]);
+	#define IF_CSWAP_I(i, j) \
+		if (LFB_FRAG_DEPTH(registers[i]) > LFB_FRAG_DEPTH(registers[j])) {SWAP_FRAGS(registers[i], registers[j]);
+	#define IF_CMOVE_I(i, j) \
+		if (LFB_FRAG_DEPTH(registers[i]) > LFB_FRAG_DEPTH(tmp)) {registers[j]=tmp;} else {registers[j]=registers[i];
+	
+	#if 0
+	for (int i = 1; i < MAX_REGISTERS; ++i)
+	{
+		if (i < count)
+		{
+			for (int j = i; j > 0; --j)
+				CSWAP(registers[j-1], registers[j])
+			continue;
+		}
+		break;
+	}
+	#else
+	
+	#if 1
+	
+	if (count > 1) {IF_CSWAP_I(0, 1)}
+	if (count > 2) {IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}
+	if (count > 3) {IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}
+	if (count > 4) {IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}
+	if (count > 5) {IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}
+	if (count > 6) {IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}
+	if (count > 7) {IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}
+	if (count > 8) {IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}
+	if (count > 9) {IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}
+	if (count > 10) {IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}
+	if (count > 11) {IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}
+	if (count > 12) {IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}
+	if (count > 13) {IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}
+	if (count > 14) {IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}
+	if (count > 15) {IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}
+	#if MAX_REGISTERS > 16
+	if (count > 16) {IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}
+	if (count > 17) {IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}
+	if (count > 18) {IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}
+	if (count > 19) {IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}
+	if (count > 20) {IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}
+	if (count > 21) {IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}
+	if (count > 22) {IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 23) {IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 24) {IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 25) {IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 26) {IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 27) {IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 28) {IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 29) {IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 30) {IF_CSWAP_I(29, 30)IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+	if (count > 31) {IF_CSWAP_I(30, 31)IF_CSWAP_I(29, 30)IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+	}}}}}}}}}}}}}}}}
+	#endif
+	}}}}}}}} }}}}}}}
+	
+	#else
+	
+	#pragma optionNV(unroll none)
+	for (int i = 1; i < MAX_REGISTERS && i < count; ++i)
+	{
+		#define PART(j) if (i >= j) CSWAP_I(j-1, j)
+		#if MAX_REGISTERS > 32
+		PART(63);
+		PART(62);
+		PART(61);
+		PART(60);
+		PART(59);
+		PART(58);
+		PART(57);
+		PART(56);
+		PART(55);
+		PART(54);
+		PART(53);
+		PART(52);
+		PART(51);
+		PART(50);
+		PART(49);
+		PART(48);
+		PART(47);
+		PART(46);
+		PART(45);
+		PART(44);
+		PART(43);
+		PART(42);
+		PART(41);
+		PART(40);
+		PART(39);
+		PART(38);
+		PART(37);
+		PART(36);
+		PART(35);
+		PART(34);
+		PART(33);
+		PART(32);
+		#endif
+		#if MAX_REGISTERS > 16
+		PART(31);
+		PART(30);
+		PART(29);
+		PART(28);
+		PART(27);
+		PART(26);
+		PART(25);
+		PART(24);
+		PART(23);
+		PART(22);
+		PART(21);
+		PART(20);
+		PART(19);
+		PART(18);
+		PART(17);
+		PART(16);
+		#endif
+		PART(15);
+		PART(14);
+		PART(13);
+		PART(12);
+		PART(11);
+		PART(10);
+		PART(9);
+		PART(8);
+		PART(7);
+		PART(6);
+		PART(5);
+		PART(4);
+		PART(3);
+		PART(2);
+		PART(1);
+	}
+	#pragma optionNV(unroll all)
+	
+	#endif
+	#endif
+	
+	//copy back to lmem
+	for (int i = 0; i < MAX_REGISTERS; ++i)
+		if (i < count)
+			frags[offset+i] = registers[i];
+			
+	//use to toggle compiling with registers or just testing the unroll
+	#if 0
+	frags[offset].x = registers[offset%MAX_REGISTERS].x;
+	#endif
+}
+	
+/*
+struct HeapNode {
+	LFB_FRAG_TYPE f;
+	int block, next;
+};
+
+HeapNode nodes[MERGE_SIZE];
+
+HeapNode tmp;
+#define CSWAP_HEAP(i, j) if (LFB_FRAG_DEPTH(nodes[i].f) < LFB_FRAG_DEPTH(nodes[j].f)) {tmp = nodes[i]; nodes[i] = nodes[j]; nodes[j] = tmp;}
+#define CSWAP_HEAP_I(i, j) if (LFB_FRAG_DEPTH(nodes[i].f) < LFB_FRAG_DEPTH(nodes[j].f)) {tmp = nodes[i]; nodes[i] = nodes[j]; nodes[j] = tmp;
+
+#if MERGE_SIZE <= 2
+#define LOG_MERGE_SIZE 1
+#elif MERGE_SIZE <= 4
+#define LOG_MERGE_SIZE 2
+#elif MERGE_SIZE <= 8
+#define LOG_MERGE_SIZE 3
+#elif MERGE_SIZE <= 16
+#define LOG_MERGE_SIZE 4
+#elif MERGE_SIZE <= 32
+#define LOG_MERGE_SIZE 5
+#endif
+
+void heapConstruct(int mergeSize)
+{
+	for (int i = MERGE_SIZE - 1; i >= 0 && i >= mergeSize; --i)
+		LFB_FRAG_DEPTH(nodes[i].f) = 99999.0;
+	
+	for (int i = (MERGE_SIZE-2) / 2; i >= 0; --i)
+	{
+		CSWAP_HEAP(
+	}
+}
+
+void heapSiftDown()
+{
+	CSWAP_HEAP_I(0, 1)
+		#if MERGE_SIZE > 2
+		CSWAP_HEAP_I(1, 2)
+			#if MERGE_SIZE > 4
+			CSWAP_HEAP_I(2, 4)
+				#if MERGE_SIZE > 8
+				CSWAP_HEAP(4, 8);
+				CSWAP_HEAP(4, 9);
+				
+				#if MERGE_SIZE > 16
+				CSWAP_HEAP(8, 16);
+				CSWAP_HEAP(8, 17);
+				CSWAP_HEAP(9, 18);
+				CSWAP_HEAP(9, 19);
+				#endif
+				#endif
+			}
+			else CSWAP_HEAP_I(2, 5)
+				#if MERGE_SIZE > 8
+				CSWAP_HEAP(5, 10);
+				CSWAP_HEAP(5, 11);
+				
+				#if MERGE_SIZE > 16
+				CSWAP_HEAP(10, 20);
+				CSWAP_HEAP(10, 21);
+				CSWAP_HEAP(11, 22);
+				CSWAP_HEAP(11, 23);
+				#endif
+				#endif
+			}
+			#endif
+		}
+		else CSWAP_HEAP_I(1, 3)
+			#if MERGE_SIZE > 4
+			CSWAP_HEAP_I(3, 6)
+				#if MERGE_SIZE > 8
+				CSWAP_HEAP(6, 12);
+				CSWAP_HEAP(6, 13);
+				
+				#if MERGE_SIZE > 16
+				CSWAP_HEAP(12, 24);
+				CSWAP_HEAP(12, 25);
+				CSWAP_HEAP(13, 26);
+				CSWAP_HEAP(13, 27);
+				#endif
+				#endif
+			}
+			else CSWAP_HEAP_I(3, 7)
+				#if MERGE_SIZE > 8
+				CSWAP_HEAP(7, 14);
+				CSWAP_HEAP(7, 15);
+				
+				#if MERGE_SIZE > 16
+				CSWAP_HEAP(14, 28);
+				CSWAP_HEAP(14, 29);
+				CSWAP_HEAP(15, 30);
+				CSWAP_HEAP(15, 31);
+				#endif
+				#endif
+			}
+			#endif
+		}
+		#endif
+	}
+	//CSWAP_HEAP(1, 0);
+}
+*/
+
+void sortAndCompositeBlocks(int fragIndex)
+{
+	//read into lmem
+	LFB_INIT(lfb, fragIndex);
+	int fragCount = 0;
+	LFB_FOREACH(lfb, frag)
+		if (fragCount < MAX_FRAGS)
+		{
+			FRAGS(fragCount) = frag;
+			++fragCount;
+		}
+	}
+
+	//sort blocks in registers
+	int mergeCount = 0;
+	for (int i = 0; i < fragCount; i += MAX_REGISTERS)
+	{
+		registerSortRange(i, min(fragCount - i, 32));
+		++mergeCount;
+	}
+	
+	int next[MERGE_SIZE];
+	for (int i = 0; i < MERGE_SIZE && i < mergeCount; ++i)
+	{
+		next[i] = min(fragCount, (i + 1) * MAX_REGISTERS) - 1;
+		registers[i] = FRAGS(next[i]);
+	}
+	
+	//merge and composite blocks
+	fragColour = vec4(1.0);
+	for (int i = 0; i < fragCount; ++i)
+	{
+		int n; //I'll assume n *will* be set by the end of the loop
+		LFB_FRAG_TYPE f;
+		LFB_FRAG_DEPTH(f) = 0.0;
+		for (int j = 0; j < MERGE_SIZE; ++j)
+		{
+			if (next[j] >= j * MAX_REGISTERS)
+			{
+				if (LFB_FRAG_DEPTH(registers[j]) > LFB_FRAG_DEPTH(f))
+				{
+					f = registers[j];
+					n = j;
+				}
+			}
+		}
+		
+		for (int j = 0; j < MERGE_SIZE; ++j)
+			if (n == j)
+				if (--next[j] >= j * MAX_REGISTERS)
+					registers[j] = FRAGS(next[j]);
+		
+		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
+		fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);
+		//fragColour.rgb += col.rgb * col.a * fragColour.a;
+		//fragColour.a *= (1.0 - col.a);
+	}
+}
+
+#else
+
+void sortAndCompositeBlocks(int fragIndex)
+{
+	//read into lmem
+	int fragCount = 0;
+	LFB_INIT(lfb, fragIndex);
+	LFB_ITER_BEGIN(lfb);
+	
+	#define SHOULD_SWAP(a, b) (LFB_FRAG_DEPTH(a) > LFB_FRAG_DEPTH(b))
+	#define SWAP_FRAGS(a, b) {tmp = a; a = b; b = tmp;}
+	#define IF_CSWAP_I(a, b) if (SHOULD_SWAP(registers[a], registers[b])) {SWAP_FRAGS(registers[a], registers[b]);
+	#define HAS_FRAGS LFB_ITER_CONDITION(lfb)
+	#define GET_FRAG(i) registers[i] = LFB_GET(lfb); LFB_ITER_INC(lfb); ++count
+
+	LFB_FRAG_TYPE tmp;
+	
+	//sort blocks in registers
+	int mergeCount = 0;
+	while (mergeCount < 16 && LFB_ITER_CONDITION(lfb))
+	{
+		int count = 0;
+		
+		GET_FRAG(0);
+		if (HAS_FRAGS) {GET_FRAG(1); IF_CSWAP_I(0, 1)}
+		if (HAS_FRAGS) {GET_FRAG(2); IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}
+		if (HAS_FRAGS) {GET_FRAG(3); IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}
+		if (HAS_FRAGS) {GET_FRAG(4); IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}
+		if (HAS_FRAGS) {GET_FRAG(5); IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}
+		if (HAS_FRAGS) {GET_FRAG(6); IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(7); IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(8); IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(9); IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(10); IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(11); IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(12); IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(13); IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(14); IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(15); IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}
+		#if MAX_REGISTERS > 16
+		if (HAS_FRAGS) {GET_FRAG(16); IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(17); IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(18); IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(19); IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(20); IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(21); IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(22); IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(23); IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(24); IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(25); IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(26); IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(27); IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(28); IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(29); IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(30); IF_CSWAP_I(29, 30)IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (HAS_FRAGS) {GET_FRAG(31); IF_CSWAP_I(30, 31)IF_CSWAP_I(29, 30)IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		}}}}}}}}}}}}}}}}
+		#endif
+		}}}}}}}} }}}}}}}
+		
+		//copy to lmem
+		//for (int i = 0; i < MAX_REGISTERS && i < count; ++i)
+		//	frags[fragCount + i] = registers[i];
+		#define CR(i) if (count > i) {frags[fragCount + i] = registers[i]
+		CR(0);CR(1);CR(2);CR(3);CR(4);CR(5);CR(6);CR(7);
+		CR(8);CR(9);CR(10);CR(11);CR(12);CR(13);CR(14);CR(15);
+		#if MAX_REGISTERS > 16
+		CR(16);CR(17);CR(18);CR(19);CR(20);CR(21);CR(22);CR(23);CR(24);CR(25);CR(26);CR(27);CR(28);CR(29);CR(30);CR(31);
+		}}}}}}}}}}}}}}}}
+		#endif
+		}}}}}}}}}}}}}}}}
+		
+		fragCount += count;
+		
+		++mergeCount;
+	}
+	
+	int next[MERGE_SIZE];
+	for (int i = 0; i < MERGE_SIZE && i < mergeCount; ++i)
+	{
+		next[i] = min(fragCount, (i + 1) * MAX_REGISTERS) - 1;
+		registers[i] = FRAGS(next[i]);
+	}
+	
+	//merge and composite blocks
+	fragColour = vec4(1.0);
+	for (int i = 0; i < fragCount; ++i)
+	{
+		int n; //I'll assume n *will* be set by the end of the loop
+		LFB_FRAG_TYPE f;
+		LFB_FRAG_DEPTH(f) = 0.0;
+		for (int j = 0; j < MERGE_SIZE; ++j)
+		{
+			if (next[j] >= j * MAX_REGISTERS)
+			{
+				if (LFB_FRAG_DEPTH(registers[j]) > LFB_FRAG_DEPTH(f))
+				{
+					f = registers[j];
+					n = j;
+				}
+			}
+		}
+		
+		for (int j = 0; j < MERGE_SIZE; ++j)
+			if (n == j)
+				if (--next[j] >= j * MAX_REGISTERS)
+					registers[j] = FRAGS(next[j]);
+		
+		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
+		fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);
+		//fragColour.rgb += col.rgb * col.a * fragColour.a;
+		//fragColour.a *= (1.0 - col.a);
+	}
+}
+
+#endif
+
+#endif
+
+//RBS global memory
+#if BLOCKSORT_GMEM
+void sortAndCompositeBlocks(int fragIndex)
+{
+	#if MERGE_SIZE > MAX_REGISTERS
+	#error Need more registers for merge cache
+	#endif
+	
+	#undef SWAP_FRAGS
+	#define SWAP_FRAGS(a, b) {tmp = a; a = b; b = tmp;}
+	
+	#undef IF_CSWAP_I
+	#define IF_CSWAP_I(i, j) \
+		if (LFB_FRAG_DEPTH(registers[i]) > LFB_FRAG_DEPTH(registers[j])) {SWAP_FRAGS(registers[i], registers[j])
+	
+	int mergeSize = 0;
+	int next[MERGE_SIZE];
+	int left[MERGE_SIZE];
+	int reader, writer;
+	
+	LFB_INIT(lfb, fragIndex);
+	reader = writer = int(imageLoad(headPtrslfb, lfbTmplfb.fragIndex).r);
+	
+	LFB_FRAG_TYPE tmp;
+	
+	int fragCount = 0;
+	while (reader != 0 && fragCount < MAX_FRAGS)
+	{
+		//#pragma optionNV(unroll all)
+		int count = 0;
+		
+		#if 1
+		for (int i = 0; i < MAX_REGISTERS && reader != 0; ++i)
+		{
+			registers[i] = LFB_FRAG_TYPE(imageLoad(datalfb, reader));
+			reader = int(imageLoad(nextPtrslfb, reader).r);
+			++count;
+		}
+		#else
+		#define READ_FRAG(i) registers[i] = LFB_FRAG_TYPE(imageLoad(datalfb, reader)); reader = int(imageLoad(nextPtrslfb, reader).r); ++count;
+		READ_FRAG(0);
+		if (reader != 0) {READ_FRAG(1);
+		if (reader != 0) {READ_FRAG(2);
+		if (reader != 0) {READ_FRAG(3);
+		if (reader != 0) {READ_FRAG(4);
+		if (reader != 0) {READ_FRAG(5);
+		if (reader != 0) {READ_FRAG(6);
+		if (reader != 0) {READ_FRAG(7);
+		if (reader != 0) {READ_FRAG(8);
+		if (reader != 0) {READ_FRAG(9);
+		if (reader != 0) {READ_FRAG(10);
+		if (reader != 0) {READ_FRAG(11);
+		if (reader != 0) {READ_FRAG(12);
+		if (reader != 0) {READ_FRAG(13);
+		if (reader != 0) {READ_FRAG(14);
+		if (reader != 0) {READ_FRAG(15);
+		#if MAX_REGISTERS > 16
+		if (reader != 0) {READ_FRAG(16);
+		if (reader != 0) {READ_FRAG(17);
+		if (reader != 0) {READ_FRAG(18);
+		if (reader != 0) {READ_FRAG(19);
+		if (reader != 0) {READ_FRAG(20);
+		if (reader != 0) {READ_FRAG(21);
+		if (reader != 0) {READ_FRAG(22);
+		if (reader != 0) {READ_FRAG(23);
+		if (reader != 0) {READ_FRAG(24);
+		if (reader != 0) {READ_FRAG(25);
+		if (reader != 0) {READ_FRAG(26);
+		if (reader != 0) {READ_FRAG(27);
+		if (reader != 0) {READ_FRAG(28);
+		if (reader != 0) {READ_FRAG(29);
+		if (reader != 0) {READ_FRAG(30);
+		if (reader != 0) {READ_FRAG(31);
+		}}}}}}}}}}}}}}}}
+		#endif
+		}}}}}}}} }}}}}}}
+		#endif
+		
+		fragCount += count;
+		
+		#if 1
+		
+		if (count > 1) {IF_CSWAP_I(0, 1)}
+		if (count > 2) {IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}
+		if (count > 3) {IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}
+		if (count > 4) {IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}
+		if (count > 5) {IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}
+		if (count > 6) {IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}
+		if (count > 7) {IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}
+		if (count > 8) {IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}
+		if (count > 9) {IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}
+		if (count > 10) {IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}
+		if (count > 11) {IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}
+		if (count > 12) {IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}
+		if (count > 13) {IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}
+		if (count > 14) {IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}
+		if (count > 15) {IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}
+		#if MAX_REGISTERS > 16
+		if (count > 16) {IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}
+		if (count > 17) {IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}
+		if (count > 18) {IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}
+		if (count > 19) {IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}
+		if (count > 20) {IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}
+		if (count > 21) {IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}
+		if (count > 22) {IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 23) {IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 24) {IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 25) {IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 26) {IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 27) {IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 28) {IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 29) {IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 30) {IF_CSWAP_I(29, 30)IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		if (count > 31) {IF_CSWAP_I(30, 31)IF_CSWAP_I(29, 30)IF_CSWAP_I(28, 29)IF_CSWAP_I(27, 28)IF_CSWAP_I(26, 27)IF_CSWAP_I(25, 26)IF_CSWAP_I(24, 25)IF_CSWAP_I(23, 24)IF_CSWAP_I(22, 23)IF_CSWAP_I(21, 22)IF_CSWAP_I(20, 21)IF_CSWAP_I(19, 20)IF_CSWAP_I(18, 19)IF_CSWAP_I(17, 18)IF_CSWAP_I(16, 17)IF_CSWAP_I(15, 16)IF_CSWAP_I(14, 15)IF_CSWAP_I(13, 14)IF_CSWAP_I(12, 13)IF_CSWAP_I(11, 12)IF_CSWAP_I(10, 11)IF_CSWAP_I(9, 10)IF_CSWAP_I(8, 9)IF_CSWAP_I(7, 8)IF_CSWAP_I(6, 7)IF_CSWAP_I(5, 6)IF_CSWAP_I(4, 5)IF_CSWAP_I(3, 4)IF_CSWAP_I(2, 3)IF_CSWAP_I(1, 2)IF_CSWAP_I(0, 1)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+		}}}}}}}}}}}}}}}}
+		#endif
+		}}}}}}}} }}}}}}}
+		
+		#else //bitonic
+		
+		#define PAD_FRAG(i) LFB_FRAG_DEPTH(registers[i]) = 0.0;
+		#undef SWAP
+		#define SWAP(i, j) if (LFB_FRAG_DEPTH(registers[i]) < LFB_FRAG_DEPTH(registers[j])) SWAP_FRAGS(registers[i], registers[j])
+		
+		if (count < 1) PAD_FRAG(0);
+		if (count < 2) PAD_FRAG(1);
+		if (count < 3) PAD_FRAG(2);
+		if (count < 4) PAD_FRAG(3);
+		if (count < 5) PAD_FRAG(4);
+		if (count < 6) PAD_FRAG(5);
+		if (count < 7) PAD_FRAG(6);
+		if (count < 8) PAD_FRAG(7);
+		#if MAX_REGISTERS > 8
+		if (count < 9) PAD_FRAG(8);
+		if (count < 10) PAD_FRAG(9);
+		if (count < 11) PAD_FRAG(10);
+		if (count < 12) PAD_FRAG(11);
+		if (count < 13) PAD_FRAG(12);
+		if (count < 14) PAD_FRAG(13);
+		if (count < 15) PAD_FRAG(14);
+		if (count < 16) PAD_FRAG(15);
+		#if MAX_REGISTERS > 16
+		if (count < 17) PAD_FRAG(16);
+		if (count < 18) PAD_FRAG(17);
+		if (count < 19) PAD_FRAG(18);
+		if (count < 20) PAD_FRAG(19);
+		if (count < 21) PAD_FRAG(20);
+		if (count < 22) PAD_FRAG(21);
+		if (count < 23) PAD_FRAG(22);
+		if (count < 24) PAD_FRAG(23);
+		if (count < 25) PAD_FRAG(24);
+		if (count < 26) PAD_FRAG(25);
+		if (count < 27) PAD_FRAG(26);
+		if (count < 28) PAD_FRAG(27);
+		if (count < 29) PAD_FRAG(28);
+		if (count < 30) PAD_FRAG(29);
+		if (count < 31) PAD_FRAG(30);
+		if (count < 32) PAD_FRAG(31);
+		#endif
+		#endif
+		SWAP(0, 1);SWAP(3, 2);SWAP(4, 5);SWAP(7, 6);
+		#if MAX_REGISTERS > 8
+		SWAP(8, 9);SWAP(11, 10);SWAP(12, 13);SWAP(15, 14);
+		#if MAX_REGISTERS > 16
+		SWAP(16, 17);SWAP(19, 18);SWAP(20, 21);SWAP(23, 22);SWAP(24, 25);SWAP(27, 26);SWAP(28, 29);SWAP(31, 30);
+		#endif
+		#endif
+		SWAP(0, 2);SWAP(1, 3);SWAP(6, 4);SWAP(7, 5);
+		#if MAX_REGISTERS > 8
+		SWAP(8, 10);SWAP(9, 11);SWAP(14, 12);SWAP(15, 13);
+		#if MAX_REGISTERS > 16
+		SWAP(16, 18);SWAP(17, 19);SWAP(22, 20);SWAP(23, 21);SWAP(24, 26);SWAP(25, 27);SWAP(30, 28);SWAP(31, 29);
+		#endif
+		#endif
+		SWAP(0, 1);SWAP(2, 3);SWAP(5, 4);SWAP(7, 6);
+		#if MAX_REGISTERS > 8
+		SWAP(8, 9);SWAP(10, 11);SWAP(13, 12);SWAP(15, 14);
+		#if MAX_REGISTERS > 16
+		SWAP(16, 17);SWAP(18, 19);SWAP(21, 20);SWAP(23, 22);SWAP(24, 25);SWAP(26, 27);SWAP(29, 28);SWAP(31, 30);
+		#endif
+		#endif
+		SWAP(0, 4);SWAP(1, 5);SWAP(2, 6);SWAP(3, 7);
+		#if MAX_REGISTERS > 8
+		SWAP(12, 8);SWAP(13, 9);SWAP(14, 10);SWAP(15, 11);
+		#if MAX_REGISTERS > 16
+		SWAP(16, 20);SWAP(17, 21);SWAP(18, 22);SWAP(19, 23);SWAP(28, 24);SWAP(29, 25);SWAP(30, 26);SWAP(31, 27);
+		#endif
+		#endif
+		SWAP(0, 2);SWAP(1, 3);SWAP(4, 6);SWAP(5, 7);
+		#if MAX_REGISTERS > 8
+		SWAP(10, 8);SWAP(11, 9);SWAP(14, 12);SWAP(15, 13);
+		#if MAX_REGISTERS > 16
+		SWAP(16, 18);SWAP(17, 19);SWAP(20, 22);SWAP(21, 23);SWAP(26, 24);SWAP(27, 25);SWAP(30, 28);SWAP(31, 29);
+		#endif
+		#endif
+		SWAP(0, 1);SWAP(2, 3);SWAP(4, 5);SWAP(6, 7);
+		#if MAX_REGISTERS > 8
+		SWAP(9, 8);SWAP(11, 10);SWAP(13, 12);SWAP(15, 14);
+		#if MAX_REGISTERS > 16
+		SWAP(16, 17);SWAP(18, 19);SWAP(20, 21);SWAP(22, 23);SWAP(25, 24);SWAP(27, 26);SWAP(29, 28);SWAP(31, 30);
+		#endif
+		#endif
+		#if MAX_REGISTERS > 8
+		SWAP(0, 8);SWAP(1, 9);SWAP(2, 10);SWAP(3, 11);SWAP(4, 12);SWAP(5, 13);SWAP(6, 14);SWAP(7, 15);
+		#if MAX_REGISTERS > 16
+		SWAP(24, 16);SWAP(25, 17);SWAP(26, 18);SWAP(27, 19);SWAP(28, 20);SWAP(29, 21);SWAP(30, 22);SWAP(31, 23);
+		#endif
+		SWAP(0, 4);SWAP(1, 5);SWAP(2, 6);SWAP(3, 7);SWAP(8, 12);SWAP(9, 13);SWAP(10, 14);SWAP(11, 15);
+		#if MAX_REGISTERS > 16
+		SWAP(20, 16);SWAP(21, 17);SWAP(22, 18);SWAP(23, 19);SWAP(28, 24);SWAP(29, 25);SWAP(30, 26);SWAP(31, 27);
+		#endif
+		SWAP(0, 2);SWAP(1, 3);SWAP(4, 6);SWAP(5, 7);SWAP(8, 10);SWAP(9, 11);SWAP(12, 14);SWAP(13, 15);
+		#if MAX_REGISTERS > 16
+		SWAP(18, 16);SWAP(19, 17);SWAP(22, 20);SWAP(23, 21);SWAP(26, 24);SWAP(27, 25);SWAP(30, 28);SWAP(31, 29);
+		#endif
+		SWAP(0, 1);SWAP(2, 3);SWAP(4, 5);SWAP(6, 7);SWAP(8, 9);SWAP(10, 11);SWAP(12, 13);SWAP(14, 15);
+		#if MAX_REGISTERS > 16
+		SWAP(17, 16);SWAP(19, 18);SWAP(21, 20);SWAP(23, 22);SWAP(25, 24);SWAP(27, 26);SWAP(29, 28);SWAP(31, 30);
+		#endif
+		#if MAX_REGISTERS > 16
+		SWAP(0, 16);SWAP(1, 17);SWAP(2, 18);SWAP(3, 19);SWAP(4, 20);SWAP(5, 21);SWAP(6, 22);SWAP(7, 23);SWAP(8, 24);SWAP(9, 25);SWAP(10, 26);SWAP(11, 27);SWAP(12, 28);SWAP(13, 29);SWAP(14, 30);SWAP(15, 31);
+		SWAP(0, 8);SWAP(1, 9);SWAP(2, 10);SWAP(3, 11);SWAP(4, 12);SWAP(5, 13);SWAP(6, 14);SWAP(7, 15);SWAP(16, 24);SWAP(17, 25);SWAP(18, 26);SWAP(19, 27);SWAP(20, 28);SWAP(21, 29);SWAP(22, 30);SWAP(23, 31);
+		SWAP(0, 4);SWAP(1, 5);SWAP(2, 6);SWAP(3, 7);SWAP(8, 12);SWAP(9, 13);SWAP(10, 14);SWAP(11, 15);SWAP(16, 20);SWAP(17, 21);SWAP(18, 22);SWAP(19, 23);SWAP(24, 28);SWAP(25, 29);SWAP(26, 30);SWAP(27, 31);
+		SWAP(0, 2);SWAP(1, 3);SWAP(4, 6);SWAP(5, 7);SWAP(8, 10);SWAP(9, 11);SWAP(12, 14);SWAP(13, 15);SWAP(16, 18);SWAP(17, 19);SWAP(20, 22);SWAP(21, 23);SWAP(24, 26);SWAP(25, 27);SWAP(28, 30);SWAP(29, 31);
+		SWAP(0, 1);SWAP(2, 3);SWAP(4, 5);SWAP(6, 7);SWAP(8, 9);SWAP(10, 11);SWAP(12, 13);SWAP(14, 15);SWAP(16, 17);SWAP(18, 19);SWAP(20, 21);SWAP(22, 23);SWAP(24, 25);SWAP(26, 27);SWAP(28, 29);SWAP(30, 31);
+		#endif
+		#endif
+		
+		#endif 
+
+		for (int i = 0; i < MERGE_SIZE; ++i)
+		{
+			if (i == mergeSize)
+			{
+				left[i] = count;
+				next[i] = writer;
+			}
+		}
+		++mergeSize;
+
+		#if 1
+		for (int i = 0; i < MAX_REGISTERS && writer != 0; ++i)
+		{
+			imageStore(datalfb, writer, vec4(registers[i] LFB_FRAG_PAD));
+			writer = int(imageLoad(nextPtrslfb, writer).r);
+		}
+		#else
+		#define WRITE_FRAG(i) imageStore(datalfb, writer, vec4(registers[i] LFB_FRAG_PAD)); writer = int(imageLoad(nextPtrslfb, writer).r);
+		WRITE_FRAG(0);
+		if (writer != 0) {WRITE_FRAG(1);
+		if (writer != 0) {WRITE_FRAG(2);
+		if (writer != 0) {WRITE_FRAG(3);
+		if (writer != 0) {WRITE_FRAG(4);
+		if (writer != 0) {WRITE_FRAG(5);
+		if (writer != 0) {WRITE_FRAG(6);
+		if (writer != 0) {WRITE_FRAG(7);
+		if (writer != 0) {WRITE_FRAG(8);
+		if (writer != 0) {WRITE_FRAG(9);
+		if (writer != 0) {WRITE_FRAG(10);
+		if (writer != 0) {WRITE_FRAG(11);
+		if (writer != 0) {WRITE_FRAG(12);
+		if (writer != 0) {WRITE_FRAG(13);
+		if (writer != 0) {WRITE_FRAG(14);
+		if (writer != 0) {WRITE_FRAG(15);
+		#if MAX_REGISTERS > 16
+		if (writer != 0) {WRITE_FRAG(16);
+		if (writer != 0) {WRITE_FRAG(17);
+		if (writer != 0) {WRITE_FRAG(18);
+		if (writer != 0) {WRITE_FRAG(19);
+		if (writer != 0) {WRITE_FRAG(20);
+		if (writer != 0) {WRITE_FRAG(21);
+		if (writer != 0) {WRITE_FRAG(22);
+		if (writer != 0) {WRITE_FRAG(23);
+		if (writer != 0) {WRITE_FRAG(24);
+		if (writer != 0) {WRITE_FRAG(25);
+		if (writer != 0) {WRITE_FRAG(26);
+		if (writer != 0) {WRITE_FRAG(27);
+		if (writer != 0) {WRITE_FRAG(28);
+		if (writer != 0) {WRITE_FRAG(29);
+		if (writer != 0) {WRITE_FRAG(30);
+		if (writer != 0) {WRITE_FRAG(31);
+		}}}}}}}}}}}}}}}}
+		#endif
+		}}}}}}}} }}}}}}}
+		#endif
+	}
+	
+	//prime the n-way merge cache
+	for (int i = 0; i < MERGE_SIZE && i < mergeSize; ++i)
+	{
+		registers[i] = LFB_FRAG_TYPE(imageLoad(datalfb, next[i]));
+		next[i] = int(imageLoad(nextPtrslfb, next[i]).r);
+	}
+	
+	//merge and composite blocks
+	fragColour = vec4(0.0, 0.0, 0.0, 1.0);
+	for (int i = 0; i < fragCount; ++i)
+	{
+		int n; //n *should* be set by the end of the loop
+		LFB_FRAG_TYPE f;
+		LFB_FRAG_DEPTH(f) = 999999.0;
+		for (int j = 0; j < MERGE_SIZE && j < mergeSize; ++j)
+		{
+			if (left[j] > 0 && LFB_FRAG_DEPTH(registers[j]) < LFB_FRAG_DEPTH(f))
+			{
+				f = registers[j];
+				n = j;
+			}
+		}
+		
+		//FIXME: replace with switch?
+		for (int j = 0; j < MERGE_SIZE; ++j)
+		{
+			if (n == j)
+			{
+				registers[j] = LFB_FRAG_TYPE(imageLoad(datalfb, next[j]));
+				next[j] = int(imageLoad(nextPtrslfb, next[j]).r);
+				--left[j];
+			}
+		}
+		
+		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
+		//fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);
+		fragColour.rgb += col.rgb * col.a * fragColour.a;
+		fragColour.a *= (1.0 - col.a);
+	}
+	fragColour.rgb += fragColour.a;
+	fragColour.a = 1.0;
+}
+#endif
+
+#if BLOCKSORT_BASE
+void sortBlock(int offset, int end)
+{
+	for (int j = offset + 1; j < end; ++j)
+	{
+		LFB_FRAG_TYPE key = FRAGS(j);
+		int i = j;
+		while (i > offset && LFB_FRAG_DEPTH(FRAGS(i-1)) > LFB_FRAG_DEPTH(key))
+		{
+			FRAGS(i) = FRAGS(i-1);
+			--i;
+		}
+		FRAGS(i) = key;
+	}
+}
+
+void sortAndCompositeBlocks(int fragIndex)
+{
+	LFB_INIT(lfb, fragIndex);
+	int fragCount = 0;
+	LFB_FOREACH(lfb, frag)
+		if (fragCount < MAX_FRAGS)
+		{
+			FRAGS(fragCount) = frag;
+			++fragCount;
+		}
+	}
+	
+	#define BLOCK_SIZE 32
+	
+	#if MAX_FRAGS > BLOCK_SIZE
+	#define BLOCK_MERGE_SIZE (MAX_FRAGS / BLOCK_SIZE)
+	#else
+	#define BLOCK_MERGE_SIZE 1
+	#endif
+	
+	int mergeSize = (fragCount / BLOCK_SIZE) + (fragCount % BLOCK_SIZE == 0 ? 0 : 1);
+	
+	int next[BLOCK_MERGE_SIZE];
+	for (int i = 0; i < mergeSize; ++i)
+	{
+		int end = min((i+1) * BLOCK_SIZE, fragCount);
+		sortBlock(i * BLOCK_SIZE, end);
+		next[i] = end - 1;
+	}
+	
+	fragColour = vec4(1.0);
+	for (int i = 0; i < fragCount; ++i)
+	{
+		int n; //I'll assume n *will* be set by the end of the loop
+		LFB_FRAG_TYPE f;
+		LFB_FRAG_DEPTH(f) = 0.0;
+		for (int j = 0; j < mergeSize; ++j)
+		{
+			if (next[j] >= j * BLOCK_SIZE)
+			{
+				if (LFB_FRAG_DEPTH(frags[next[j]]) > LFB_FRAG_DEPTH(f))
+				{
+					f = FRAGS(next[j]);
+					n = j;
+				}
+			}
+		}
+		--next[n];
+		
+		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
+		//col.a = 0.1;
+		fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);
+	}
+}
+#endif

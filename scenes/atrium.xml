@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<scene>
+	<mesh name="atrium">
+		<file src="sponza/sponza.3ds"/>
+	</mesh>
+	<object backface="0" mesh="atrium" resize-cover="0 10 0"/>
+	<view name="balcony-dc50">
+	0.137331 -0.502532 1.09869
+	-0.061265 -0.159267 0
+	6.52661
+	</view>
+	<view name="floor-dc30">
+	0 -3.2 -0.5
+	0.2 0 0
+	1.32913
+	</view>
+	<view name="column-dc150">
+	-1.52546 -3.72609 7.62876
+	0.05 0 0
+	0
+	</view>
+	<view name="animstart">
+	0.392454 -0.494273 6.58101
+	0.0137844 2.95702 0
+	13.8971
+	</view>
+</scene>

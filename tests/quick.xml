@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<benchmark>
+	
+	max: 64
+	
+	PACK: 1
+	TILES: 0
+	BMA: 0
+	PRESORT: 0
+	MERGESORT: 0
+	REGISTERSORT: 0
+	BSLMEM: 0
+	BSGMEM: 0
+	BSBASE: 0
+	CUDA: 0
+	SHAREDSORT: 0
+	PASS: 0
+	
+	<warmup time="4.0 10.0" frames="5 100" />
+	<duration time="4.0 20.0" frames="10 100" />
+	
+	<test name="powerplant" disabled="0">
+		scene: powerplant
+		max: 512
+		view: 0
+		<sync>
+		    BMA:    0, 1, 1
+		    BSLMEM: 0, 0, 1
+		</sync>
+	</test>
+	<test name="atrium" disabled="0">
+		scene: atrium
+		max: 64
+		view: 0
+		<sync>
+		    BMA:    0, 1, 1
+		    BSLMEM: 0, 0, 1
+		</sync>
+	</test>
+	<test name="hairball" disabled="1">
+		max: 256
+		scene: hairball
+		view: 0, 1
+		<sync range="2:">
+			MERGESORT: 0, 0,   0, 1, 0, 0,   0, 1, 0,   0, 1, 0
+			BSLMEM:    0, 0,   0, 0, 1, 0,   0, 0, 1,   0, 0, 1
+			BSGMEM:    0, 0,   0, 0, 0, 1,   0, 0, 0,   0, 0, 0
+			CUDA:      0, 0,   0, 0, 0, 0,   1, 1, 1,   0, 0, 0
+			BMA:       0, 1,   0, 0, 0, 0,   0, 0, 0,   1, 1, 1
+			PASS:      1, 1,   0, 0, 0, 0,   0, 0, 0,   0, 0, 0
+		</sync>
+	</test>
+	<test name="planes2" disabled="1">
+		max: 128
+		scene: planes2
+		view: 0, 1
+		<sync range="2:">
+			MERGESORT: 0, 0,   0, 1, 0, 0,   0, 1, 0,   0, 1, 0
+			BSLMEM:    0, 0,   0, 0, 1, 0,   0, 0, 1,   0, 0, 1
+			BSGMEM:    0, 0,   0, 0, 0, 1,   0, 0, 0,   0, 0, 0
+			CUDA:      0, 0,   0, 0, 0, 0,   1, 1, 1,   0, 0, 0
+			BMA:       0, 1,   0, 0, 0, 0,   0, 0, 0,   1, 1, 1
+			PASS:      1, 1,   0, 0, 0, 0,   0, 0, 0,   0, 0, 0
+		</sync>
+	</test>
+</benchmark>

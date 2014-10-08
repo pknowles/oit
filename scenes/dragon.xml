@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<scene>
+	<mesh name="dragon">
+		<file src="dragon.ctm"/>
+	</mesh>
+	<object mesh="dragon" resize-cover="0 10 0"/>
+</scene>
