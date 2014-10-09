@@ -41,9 +41,12 @@ private:
 	
 	bool dirtyShaders;
 	Profiler* profiler;
+	vec2i presortTileSize;
 	vec2i indexingTileSize;
 	TextureBuffer* sortedOrder;
 	TextureBuffer* colourBuffer;
+	Shader* shaderPresort;
+	Shader* shaderReuse;
 	Shader* shaderComposite;
 	Shader* shaderSharedSort;
 	std::vector<BMA> bmaIntervals;

@@ -55,7 +55,6 @@ const char* sceneFiles[] = {
 	"scenes/powerplant.xml",
 	"scenes/hairball.xml",
 	"scenes/tree.xml",
-	"scenes/spheres.xml",
 	};
 
 bool directionalLight = true;
@@ -74,7 +73,8 @@ void selectType()
 	{
 	case 0: oit.setLFBType(LFB::LFB_TYPE_LL); break;
 	case 1: oit.setLFBType(LFB::LFB_TYPE_L); break;
-	case 2: oit.setLFBType(LFB::LFB_TYPE_B); break;
+	case 2: oit.setLFBType(LFB::LFB_TYPE_CL); break;
+	case 3: oit.setLFBType(LFB::LFB_TYPE_B); break;
 	}
 }
 
@@ -258,7 +258,6 @@ void update(float dt)
 	if (jeltz.buttonDown("3")) changeScene(sceneFiles[2]);
 	if (jeltz.buttonDown("4")) changeScene(sceneFiles[3]);
 	if (jeltz.buttonDown("5")) changeScene(sceneFiles[4]);
-	if (jeltz.buttonDown("6")) changeScene(sceneFiles[5]);
 	
 	if (jeltz.resized() /* && !benchmark.running */)
 	{
@@ -291,7 +290,7 @@ void update(float dt)
 			for (size_t i = 0; i < h.size(); ++i)
 				hfile << i << "," << h[i] << std::endl;
 			hfile.close();
-			printf("Max DC: %i\n", (int)h.size()-1);
+			printf("Max DC: %i\n", h.size()-1);
 			printf("Frags: %i\n", oit.getTotalFragments());
 		}
 		else
@@ -463,13 +462,12 @@ void display()
 	#endif
 }
 
-/*
-static void hdl(int sig, siginfo_t *siginfo, void *context)
+
+static void hdl (int sig, siginfo_t *siginfo, void *context)
 {
 	printf ("Sending PID: %ld, UID: %ld\n",
 			(long)siginfo->si_pid, (long)siginfo->si_uid);
 }
-*/
 
 #include <dlfcn.h>
 #include "cuda/interface.h"
@@ -508,7 +506,7 @@ int main(int argc, char* argv[])
 	
 	scene.forceDoubleSided = true;
 	scene.setCamera(&fly.camera);
-	scene.load(sceneFiles[5]);
+	scene.load(sceneFiles[1]);
 	scene.enableLighting(false);
 	viewSlider.i = 0;
 	viewSlider.upper = mymax(0, scene.getNumViews() - 1);
@@ -543,6 +541,7 @@ int main(int argc, char* argv[])
 	
 	lfbType.add("LL-LFB");
 	lfbType.add("L-LFB");
+	lfbType.add("CL-LFB");
 	lfbType.add("B-LFB");
 	lfbType.capture(QG::SELECT, selectType);
 

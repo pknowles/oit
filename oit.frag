@@ -33,9 +33,15 @@ out vec4 fragColour;
 #define INDEX_WITH_TILES set_by_app
 #define INDEX_TILE_SIZE 4,8
 
+#define PRESORT_SORT 0
+#define PRESORT_REUSE 0
 #define SORT_IN_REGISTERS 0
 #define SORT_IN_BOTH 0
 #define COMPOSITE_ONLY 0
+
+#if PRESORT_SORT || PRESORT_REUSE
+#include "presort.glsl"
+#endif
 
 #if SORT_IN_REGISTERS || SORT_IN_BOTH
 #include "registers.glsl"
@@ -62,15 +68,21 @@ void main()
 	int fragIndex = LFB_FRAG_HASH(lfb);
 	#endif
 	
-	#if COMPOSITE_ONLY
-	compositeOnly(fragIndex);
+	#if PRESORT_SORT
+	presortFrags();
+	#elif PRESORT_REUSE
+	reuseSort(fragIndex);
 	#else
-		#if (SORT_IN_REGISTERS || SORT_IN_BOTH) && MAX_FRAGS <= 32
-		sortAndCompositeRegisters(fragIndex);
-		#elif SORT_IN_BOTH
-		sortAndCompositeBlocks(fragIndex);
+		#if COMPOSITE_ONLY
+		compositeOnly(fragIndex);
 		#else
-		sortAndComposite(fragIndex);
+			#if (SORT_IN_REGISTERS || SORT_IN_BOTH) && MAX_FRAGS <= 32
+			sortAndCompositeRegisters(fragIndex);
+			#elif SORT_IN_BOTH
+			sortAndCompositeBlocks(fragIndex);
+			#else
+			sortAndComposite(fragIndex);
+			#endif
 		#endif
 	#endif
 	

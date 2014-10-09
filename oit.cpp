@@ -3,6 +3,7 @@
 #include <pyarlib/shader.h>
 #include <pyarlib/gpu.h>
 #include <pyarlib/camera.h>
+#include <lfb/lfbCL.h>
 #include <lfb/lfbL.h>
 #include <lfb/lfbLL.h>
 
@@ -15,6 +16,30 @@
 #endif
 
 #include "oit.h"
+
+#ifndef glDispatchCompute
+#ifdef __cplusplus
+extern "C" {
+#endif
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+#ifndef APIENTRYP
+#define APIENTRYP APIENTRY *
+#endif
+#ifndef GLAPI
+#define GLAPI extern
+#endif
+#define GL_MAX_COMPUTE_WORK_GROUP_COUNT 0x91BE
+GLAPI void APIENTRY glDispatchCompute (GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z);
+GLAPI void APIENTRY glDispatchComputeIndirect (GLintptr indirect);
+typedef void (APIENTRYP PFNGLDISPATCHCOMPUTEPROC) (GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z);
+typedef void (APIENTRYP PFNGLDISPATCHCOMPUTEINDIRECTPROC) (GLintptr indirect);
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 
 static Shader depthOnly("count");
 static Shader writeBMAMask("bmaMask");
@@ -39,7 +64,7 @@ OIT::Optimization& OIT::Optimization::operator=(const bool& b)
 	{
 		enabled = b;
 		if (!parent->optimizationSet(id, enabled))
-			enabled = !b; //cannot set. revert. NOTE: requires above (enabled != b) check
+			enabled = !b; //revert. NOTE: requires above (enabled != b) check
 	}
 	return *this;
 }
@@ -58,30 +83,39 @@ OIT::OIT()
 {
 	colourBuffer = NULL;
 	
+	presortTileSize = vec2i(16, 16);
 	indexingTileSize = vec2i(2, 8);
 	
 	optimizations.push_back(Optimization("PACK", "Pack colour to RGBA8", this));
 	optimizations.push_back(Optimization("TILES", "Index by Raster Pattern", this));
-	//optimizations.push_back(Optimization("PASS", "No Sorting", this));
+	optimizations.push_back(Optimization("PASS", "No Sorting", this));
 	optimizations.push_back(Optimization("BMA", "Backwards Memory Allocation", this));
+	//optimizations.push_back(Optimization("PRESORT", "Attempt Sort Reuse", this));
 	optimizations.push_back(Optimization("MERGESORT", "Include Mergesort", this));
 	optimizations.push_back(Optimization("REGISTERSORT", "Sort in Registers", this));
 	optimizations.push_back(Optimization("BSLMEM", "RBS from lmem", this));
 	optimizations.push_back(Optimization("BSGMEM", "RBS from gmem", this));
 	optimizations.push_back(Optimization("BSBASE", "BS in lmem", this));
 	optimizations.push_back(Optimization("CUDA", "Basic CUDA", this));
+	//optimizations.push_back(Optimization("SHAREDSORT", "Shared Sort Test", this));
 	
-	//NOTE: this must be before setting any defaults
+	//STUPID PYAR!!! This comes FIRST!!!
 	for (size_t i = 0; i < optimizations.size(); ++i)
 		optimizationIDs[optimizations[i].id] = i;
 	
 	(*this)["PACK"] = true;
-	(*this)["BMA"] = true;
-	(*this)["BSLMEM"] = true;
 		
 	profiler = NULL;
 	
 	dirtyShaders = true;
+	
+	shaderPresort = new Shader("oit");
+	shaderPresort->name("oit-presort");
+	shaderPresort->define("PRESORT_SORT", 1);
+	
+	shaderReuse = new Shader("oit");
+	shaderReuse->name("oit-reuse");
+	shaderReuse->define("PRESORT_REUSE", 1);
 	
 	shaderComposite = new Shader("oit");
 	shaderComposite->name("oit-composite");
@@ -93,9 +127,13 @@ OIT::OIT()
 
 OIT::~OIT()
 {
+	shaderPresort->release();
+	shaderReuse->release();
 	shaderComposite->release();
 	sortedOrder->release();
 	shaderSharedSort->release();
+	delete shaderPresort;
+	delete shaderReuse;
 	delete shaderComposite;
 	delete sortedOrder;
 	delete shaderSharedSort;
@@ -110,7 +148,7 @@ OIT::~OIT()
 void OIT::setLFBType(LFB::LFBType type)
 {
 	lfb.setType(type);
-	lfb->requireCounts((*this)["BMA"]);
+	lfb->requireCounts((*this)["BMA"] || (*this)["PRESORT"]);
 	lfb->profile = profiler;
 	dirtyShaders = true;
 }
@@ -228,6 +266,59 @@ void OIT::compositeFromLFB()
 		CHECKERROR;
 		#endif
 	}
+	else if ((*this)["PRESORT"])
+	{
+		vec2i presortTileCount = lfb->getSize() / presortTileSize;
+		
+		//FIXME: maybe pack this?
+		sortedOrder->resize(presortTileCount.x * presortTileCount.y * sizeof(unsigned int) * lfb->getMaxFrags());
+	
+		if (!shaderPresort->use())
+			return;
+		lfb->setUniforms(*shaderPresort, "lfb");
+		shaderPresort->set("sortedOrder", *sortedOrder);
+		shaderPresort->set("presortTileSize", presortTileSize);
+		shaderPresort->set("presortTiles", presortTileCount);
+		drawSSQuad(presortTileCount);
+		shaderPresort->unuse();
+		
+		if (profiler) profiler->time("Presort");
+		
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_ALWAYS, 1<<7, 1<<7);
+		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+		if (!shaderReuse->use())
+			return;
+		lfb->setUniforms(*shaderReuse, "lfb");
+		shaderReuse->set("sortedOrder", *sortedOrder);
+		shaderReuse->set("presortTileSize", presortTileSize);
+		shaderReuse->set("presortTiles", presortTileCount);
+		drawSSQuad();
+		shaderReuse->unuse();
+		
+		if (profiler) profiler->time("Reuse");
+		
+		if ((*this)["BMA"])
+		{
+			createBMAMask();
+			compositeWithBMA();
+		}
+		else
+		{
+			glStencilFunc(GL_NOTEQUAL, 1<<7, 1<<7);
+			glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+			//render OIT
+			if (!shaderComposite->use())
+				return;
+			lfb->setUniforms(*shaderComposite, "lfb");
+			drawSSQuad();
+			shaderComposite->unuse();
+		}
+		glDisable(GL_STENCIL_TEST);
+		
+		if (profiler) profiler->time("Fix");
+	}
 	else if ((*this)["BMA"])
 	{
 		glClear(GL_STENCIL_BUFFER_BIT);
@@ -236,6 +327,19 @@ void OIT::compositeFromLFB()
 	}
 	else
 	{
+		if ((*this)["SHAREDSORT"])
+		{
+			shaderSharedSort->use();
+			shaderSharedSort->set("totalPixels", lfb->getTotalPixels());
+			lfb->setUniforms(*shaderSharedSort, "lfb");
+			int i = 65000;
+			//glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_COUNT, &i);
+			//glDispatchCompute(mymin(i, ceil(lfb->getTotalPixels(),8)), 1, 1);
+			CHECKERROR;
+			shaderSharedSort->unuse();
+			if (profiler) profiler->time("Shared Sort");
+		}
+		
 		//render OIT
 		if (!shaderComposite->use())
 			return;
@@ -316,8 +420,10 @@ void OIT::updateShaders()
 	bmaIntervals.resize(intervalsNeeded);
 	
 	//update defines
-	for (size_t j = 0; j < bmaIntervals.size(); ++j)
-		setDefines(bmaIntervals[j].shader);
+	for (size_t i = 0; i < bmaIntervals.size(); ++i)
+		setDefines(bmaIntervals[i].shader);
+	setDefines(shaderPresort);
+	setDefines(shaderReuse);
 	setDefines(shaderComposite);
 	setDefines(shaderSharedSort);
 	setDefines(&writeBMAMask);
@@ -329,9 +435,9 @@ void OIT::updateShaders()
 	shaderComposite->reload();
 	std::ofstream ofile("shader.bin", std::ios::binary);
 	std::string b = shaderComposite->getBinary();
-	for (size_t j = 0; j < b.size(); ++j)
-		if ((b[j] < 32 && b[j] != 10) || b[j] > 126)
-			b[j] = '#';
+	for (size_t i = 0; i < b.size(); ++i)
+		if ((b[i] < 32 && b[i] != 10) || b[i] > 126)
+			b[i] = '#';
 	ofile << b;
 	ofile.flush();
 	#endif
@@ -354,11 +460,14 @@ bool OIT::optimizationSet(const std::string& id, bool enabled)
 		//deinitialization
 		if (id == "TILES")
 			lfb->setPack(vec2i(1, 1));
+			
+		if (id == "PRESORT")
+			sortedOrder->release();
 	}
 	
 	lfb->setFormat((*this)["PACK"] ? GL_RG32F : GL_RGBA32F);
 	
-	lfb->requireCounts((*this)["BMA"]);
+	lfb->requireCounts((*this)["BMA"] || (*this)["PRESORT"]);
 	
 	if ((*this)["CUDA"])
 	{
@@ -400,7 +509,7 @@ void OIT::draw(void (*scene)(Shader*), Shader* shader)
 
 OIT::Optimization& OIT::operator[](int i)
 {
-	if (i < 0 || i > (int)optimizations.size())
+	if (i < 0 || i > optimizations.size())
 	{
 		static OIT::Optimization notfound;
 		return notfound;

@@ -14,7 +14,7 @@ endif
 NOOP = @$(SHELL) -c true
 
 
-.PHONY: all debug prof opt clean cleaner nocuda default
+.PHONY=all,debug,prof,opt,clean,cleaner
 TARGET=oit
 CC=g++
 LD=g++
@@ -27,21 +27,15 @@ LFLAGS=
 LFLAGS+= `sdl2-config --libs` -lrt -lGLU -lGLEW `pkg-config freetype2 --libs` -lm -lpthread -lpng -lz -lGL -ldl
 SUBLIBS= ../lfb/liblfb$(ASFX).a ../pyarlib/pyarlib$(ASFX).a
 OBJECTS= ./oit.o ./main.o
-CUDA_DEP= cuda/liboitcuda.so
 CUDA_OBJECTS= cuda/interface.o cuda/oit.o cuda/dlink.o
 CUDA_LIBS= -L$(CUDA_HOME)/lib$(ASFX) -lcudart
 NOCUDA= 0
 
-all: nocuda
-cuda: withcuda
+all: lfbliblfba pyarlibpyarliba $(TARGET)
 
 nocuda: CFLAGS+= -DNO_CUDA
 nocuda: NOCUDA=1
-nocuda: CUDA_DEP=
-nocuda: lfbliblfba pyarlibpyarliba $(TARGET)
-
-withcuda: $(CUDA_DEP) lfbliblfba pyarlibpyarliba $(TARGET)
-
+nocuda: all
 
 debug: CFLAGS+= -g
 debug: export CFLAGS_R+= -g
@@ -66,15 +60,14 @@ ALL_SUBLIBS+= $(SUBSUBLIBS_PYARLIBPYARLIBA:%.a=../pyarlib/%.a)
 echodeps:
 	@echo $(ALL_SUBLIBS)
 
+
 #linking/archiving the target
-$(TARGET): $(SUBLIBS) $(OBJECTS)
+$(TARGET): $(SUBLIBS) $(OBJECTS) liboitcuda.so
 	@echo linking $(TARGET)
 	$(LD) -o $(TARGET) $(OBJECTS) $(ALL_SUBLIBS) $(LFLAGS) `[[ $(NOCUDA) == 1 ]] || echo $(CUDA_OBJECTS) $(CUDA_LIBS)`
 
-cuda/liboitcuda.so: cuda/interface.h cuda/interface.cpp cuda/oit.cu cuda/oit.cuh
-	@echo +cuda
-	make --no-print-directory -C cuda
-	@echo -cuda
+liboitcuda.so: cuda/interface.h cuda/interface.cpp cuda/oit.cu cuda/oit.cuh
+	make -C cuda
 
 #target dependent libraries
 ../lfb/liblfb$(ASFX).a:
@@ -107,9 +100,6 @@ cleaner: clean
 	@echo +../pyarlib
 	@$(MAKE) clean --no-print-directory -C ../pyarlib
 	@echo -../pyarlib
-	@echo +cuda
-	@$(MAKE) clean --no-print-directory -C cuda
-	@echo -cuda
 
 
 

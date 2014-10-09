@@ -1,0 +1,100 @@
+#version 430
+
+#define N_FRAGS 32
+
+#define ROWS 8
+
+layout(local_size_x = N_FRAGS, local_size_y = ROWS, local_size_z = 1) in;
+
+#include "lfb.glsl"
+LFB_DEC(lfb);
+
+/*
+in uvec3 gl_NumWorkGroups;
+in uvec3 gl_WorkGroupID;
+in uvec3 gl_LocalInvocationID;
+in uvec3 gl_GlobalInvocationID;
+in uint  gl_LocalInvocationIndex;
+*/
+
+
+//gl_LocalInvocationIndex
+
+//memoryBarrierShared
+//groupMemoryBarrier
+//barrier
+
+shared LFB_FRAG_TYPE frags[N_FRAGS * ROWS];
+
+uniform int totalPixels;
+
+void main()
+{
+	LFB_FRAG_TYPE tmp;
+	#define SWAP_BITONIC_SORT(a, b) \
+		if (LFB_FRAG_DEPTH(frags[so+a]) > LFB_FRAG_DEPTH(frags[so+b])) \
+		{ \
+			tmp = frags[so+a]; frags[so+a] = frags[so+b]; frags[so+b] = tmp; \
+		}
+	
+	int pixelOffset = int(gl_LocalInvocationID.y);
+	int pixel = int(gl_WorkGroupID.x * ROWS) + pixelOffset;
+	
+	if (pixel >= totalPixels)
+		return;
+	
+	int i = int(gl_LocalInvocationID.x);
+	int so = pixelOffset * N_FRAGS;
+	
+	LFB_INIT(lfb, pixel);
+	//LFB_ITER_BEGIN(lfb);
+	
+	int fragCount = LFB_COUNT(lfb);
+	
+	if (i < fragCount)
+		frags[so+i] = LFB_LOAD(lfb, fragCount - i);
+	else
+		LFB_FRAG_DEPTH(frags[so+i]) = 9999.0;
+	
+	//memoryBarrierShared();
+	
+	#if 1
+	
+	#if N_FRAGS == 8
+	#define LOG2_NFRAGS 3
+	#elif N_FRAGS == 16
+	#define LOG2_NFRAGS 4
+	#elif N_FRAGS == 32
+	#define LOG2_NFRAGS 5
+	#elif N_FRAGS == 64
+	#define LOG2_NFRAGS 6
+	#elif N_FRAGS == 128
+	#define LOG2_NFRAGS 7
+	#endif
+
+	#pragma optionNV(unroll all)
+	for (int lk = 1; lk <= LOG2_NFRAGS; ++lk)
+	{
+		int k = 1<<lk;
+		for (int lj = lk-1; lj >= 0; --lj)
+		{
+			int j = 1<<lj;
+			int ixj = i ^ j;
+			if (ixj > i)
+			{
+				if ((i & k) == 0) SWAP_BITONIC_SORT(i,ixj)
+				if ((i & k) != 0) SWAP_BITONIC_SORT(ixj,i)
+				//memoryBarrierShared();
+			}
+		}
+	}
+	
+	#endif
+	
+	if (i < fragCount)
+	{
+		//LFB_STORE(lfb, fragCount - i, frags[so+i]);
+		imageStore(datalfb, lfbTmplfb.fragOffset + (fragCount - i), vec4(frags[so+i] LFB_FRAG_PAD));
+	}
+}
+

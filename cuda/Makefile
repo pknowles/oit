@@ -34,7 +34,7 @@ NV_CFLAGS= $(ALL_CFLAGS) -I$(CUDA_HOME)/samples/common/inc -I/home/pknowles/NVID
 # -arch=sm_35
 NV_LFLAGS= -lcuda -lcudpp -shared
 # -lcudadevrt
-SUBLIBS= ../../pyarlib/pyarlib$(ASFX).a
+SUBLIBS= ../../pyarlib/pyarlib$(ASFX).a ../../lfb/liblfb$(ASFX).a
 OBJECTS= ./interface.o ./oit.o
 
 all: pyarlibpyarliba $(TARGET)
@@ -107,7 +107,6 @@ clean:
 	@rm -f $(OBJECTS)
 	@rm -f $(TARGET)
 	@rm -f dlink.o
-	@rm -f *.{cpp,cpp1,cpp2,cpp3,cpp4}.{i,ii} *.cudafe[12].* *.fatbin* *.hash *.ptx *.cubin *.module_id  #FIXME: hard coded
 cleaner: clean
 	@echo +../../pyarlib
 	@$(MAKE) cleaner --no-print-directory -C ../../pyarlib
