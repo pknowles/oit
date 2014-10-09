@@ -1,0 +1,13 @@
+oit
+*.bin
+
+#cuda intermediates
+*.i
+*.ii
+cuda/oit.cudafe*
+cuda/oit.fatbin*
+cuda/oit.hash
+cuda/oit.module_id
+*.ptx
+*.cubin
+

@@ -125,7 +125,7 @@ void updateBenchmark()
 	std::string sceneName = benchmark.getStr("scene");
 	if (sceneName.size())
 		changeScene("scenes/" + sceneName + ".xml");
-	else
+	else if (benchmark.running)
 		printf("\n\n\n########## ERROR: INVALID SCENE NAME (%s) ##########\n\n\n", sceneName.c_str());
 	benchmark.ignoreNextUpdate();
 	
@@ -571,9 +571,9 @@ int main(int argc, char* argv[])
 	dragon.upload();
 	*/
 	
-	printf("Polygons: %i\n", dragon.numPolygons);
-	printf("Indices: %i\n", dragon.numIndices);
-	printf("Vertices: %i\n", dragon.numVertices);
+	//printf("Polygons: %i\n", dragon.numPolygons);
+	//printf("Indices: %i\n", dragon.numIndices);
+	//printf("Vertices: %i\n", dragon.numVertices);
 	
 	benchmark.setDefault("max", 64);
 	
