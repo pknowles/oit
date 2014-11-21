@@ -325,7 +325,7 @@ void OIT::updateShaders()
 	
 	printf("Shaders Updated\n");
 		
-	#if 1
+	#if 0
 	shaderComposite->reload();
 	std::ofstream ofile("shader.bin", std::ios::binary);
 	std::string b = shaderComposite->getBinary();
@@ -381,6 +381,8 @@ bool OIT::optimizationSet(const std::string& id, bool enabled)
 
 void OIT::draw(void (*scene)(Shader*), Shader* shader)
 {
+	CHECKERROR;
+
 	if (shader->error() || shaderComposite->error())
 		return;
 

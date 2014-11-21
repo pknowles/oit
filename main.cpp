@@ -5,7 +5,7 @@ Visual studio *spit* *spit* *spit* steps:
 1. Add entire pyarlib directory to a pyarlib library project or your main executable
 2. Add resources.rc to your main executable
 3. Include these libraries (project properties->linker->input->additional dependecies):
-	glew32.lib;freetype248.lib;SDL13.lib;libpng.lib;zlib.lib;opengl32.lib;glu32.lib;openctm.lib
+	glew32.lib;freetype248.lib;SDL2.lib;libpng.lib;zlib.lib;opengl32.lib;glu32.lib
 4. Some files (currently just "pyarlib/mesh/simpleobj/obj.c") need to be compiled as C++
 	project properties->C++->advanced->compile as
 5. Build (this file, template.txt, is an example main.cpp file)
@@ -16,7 +16,10 @@ Visual studio *spit* *spit* *spit* steps:
 #include <pyarlib/benchmark.h>
 #include <pyarlib/scene.h>
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <signal.h>
 
 #include "oit.h"
@@ -471,10 +474,12 @@ static void hdl(int sig, siginfo_t *siginfo, void *context)
 }
 */
 
+/*
 #include <dlfcn.h>
 #include "cuda/interface.h"
 
 Shader s("s");
+*/
 
 int main(int argc, char* argv[])
 {

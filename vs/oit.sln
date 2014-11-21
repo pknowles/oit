@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mesh", "..\..\pyarlib\vs\mesh.vcxproj", "{C0363093-1174-4968-A300-928E93FC061C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyarlib", "..\..\pyarlib\vs\pyarlib.vcxproj", "{C664BED8-BC3C-4614-82F0-9689508EF3E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0363093-1174-4968-A300-928E93FC061C} = {C0363093-1174-4968-A300-928E93FC061C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lfb", "..\..\lfb\vs\lfb.vcxproj", "{36EA31C5-CF92-4F49-BA1A-D7A30766A3E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C664BED8-BC3C-4614-82F0-9689508EF3E9} = {C664BED8-BC3C-4614-82F0-9689508EF3E9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oit", "oit.vcxproj", "{3A827E61-CAC8-423F-A829-81143E1F4450}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B07887B9-8825-44A2-9452-D73FAB182FB3} = {B07887B9-8825-44A2-9452-D73FAB182FB3}
+		{36EA31C5-CF92-4F49-BA1A-D7A30766A3E6} = {36EA31C5-CF92-4F49-BA1A-D7A30766A3E6}
+		{C664BED8-BC3C-4614-82F0-9689508EF3E9} = {C664BED8-BC3C-4614-82F0-9689508EF3E9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oit_cuda", "oit_cuda.vcxproj", "{B07887B9-8825-44A2-9452-D73FAB182FB3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0363093-1174-4968-A300-928E93FC061C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C0363093-1174-4968-A300-928E93FC061C}.Debug|Win32.Build.0 = Debug|Win32
+		{C0363093-1174-4968-A300-928E93FC061C}.Release|Win32.ActiveCfg = Release|Win32
+		{C0363093-1174-4968-A300-928E93FC061C}.Release|Win32.Build.0 = Release|Win32
+		{C664BED8-BC3C-4614-82F0-9689508EF3E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C664BED8-BC3C-4614-82F0-9689508EF3E9}.Debug|Win32.Build.0 = Debug|Win32
+		{C664BED8-BC3C-4614-82F0-9689508EF3E9}.Release|Win32.ActiveCfg = Release|Win32
+		{C664BED8-BC3C-4614-82F0-9689508EF3E9}.Release|Win32.Build.0 = Release|Win32
+		{36EA31C5-CF92-4F49-BA1A-D7A30766A3E6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{36EA31C5-CF92-4F49-BA1A-D7A30766A3E6}.Debug|Win32.Build.0 = Debug|Win32
+		{36EA31C5-CF92-4F49-BA1A-D7A30766A3E6}.Release|Win32.ActiveCfg = Release|Win32
+		{36EA31C5-CF92-4F49-BA1A-D7A30766A3E6}.Release|Win32.Build.0 = Release|Win32
+		{3A827E61-CAC8-423F-A829-81143E1F4450}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A827E61-CAC8-423F-A829-81143E1F4450}.Debug|Win32.Build.0 = Debug|Win32
+		{3A827E61-CAC8-423F-A829-81143E1F4450}.Release|Win32.ActiveCfg = Release|Win32
+		{3A827E61-CAC8-423F-A829-81143E1F4450}.Release|Win32.Build.0 = Release|Win32
+		{B07887B9-8825-44A2-9452-D73FAB182FB3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B07887B9-8825-44A2-9452-D73FAB182FB3}.Release|Win32.ActiveCfg = Release|Win32
+		{B07887B9-8825-44A2-9452-D73FAB182FB3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
