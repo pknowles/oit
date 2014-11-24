@@ -1,7 +1,7 @@
-oit
+Order-Independent Transparency (OIT)
 ===
 
-An order-independent transparency demo framework, including optimizations and benchmark support.
+An order-independent transparency demo framework, including optimizations and benchmark support. With [published strategies](http://heuristic42.com/research/) for fast sorting, this demo shows performance improvements over the basic per-pixel linked lists method of up to a factor of 5 or more.
 
 NOTE: I haven't had time to prettify everything (I won't argue with people calling the code a mess).
 There are makefiles for **gcc/Fedora 20** and solution/project files tested with **vs2013/Windows 7**.
