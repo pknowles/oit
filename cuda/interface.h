@@ -23,7 +23,7 @@ template<typename T> struct my_demand;
 
 class OIT_CUDA
 {
-	friend class my_demand<OIT_CUDA>;
+	friend struct my_demand<OIT_CUDA>;
 	OIT_CUDA();
 	bool error;
 	void init();
