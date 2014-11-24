@@ -3,8 +3,8 @@ oit
 
 An order-independent transparency demo framework, including optimizations and benchmark support.
 
-NOTE: I haven't had time to prettify everything (I won't argue with people calling the code a mess)
-or test windows (currently using fedora). However, I do plan to at some point.
+NOTE: I haven't had time to prettify everything (I won't argue with people calling the code a mess).
+There are makefiles for **gcc/Fedora 20** and solution/project files tested with **vs2013/Windows 7**.
 
 A little description of OIT and this code is here: http://heuristic42.com/opengl/oit/
 
