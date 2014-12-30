@@ -12,3 +12,4 @@ cuda/oit.module_id
 *.cubin
 
 config.cfg
+benchmark.csv

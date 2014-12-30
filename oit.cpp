@@ -90,7 +90,7 @@ OIT::OIT()
 	optimizations.push_back(Optimization("TILES", "Index by Raster Pattern", this));
 	optimizations.push_back(Optimization("PASS", "No Sorting", this));
 	optimizations.push_back(Optimization("BMA", "Backwards Memory Allocation", this));
-	//optimizations.push_back(Optimization("PRESORT", "Attempt Sort Reuse", this));
+	optimizations.push_back(Optimization("PRESORT", "Attempt Sort Reuse", this));
 	optimizations.push_back(Optimization("MERGESORT", "Include Mergesort", this));
 	optimizations.push_back(Optimization("REGISTERSORT", "Sort in Registers", this));
 	optimizations.push_back(Optimization("BSLMEM", "RBS from lmem", this));

@@ -132,6 +132,17 @@ void updateBenchmark()
 		printf("\n\n\n########## ERROR: INVALID SCENE NAME (%s) ##########\n\n\n", sceneName.c_str());
 	benchmark.ignoreNextUpdate();
 	
+	//change lfb type
+	std::string lfbTypeStr = benchmark.getStr("lfb");
+	bool setType = true;
+	if (lfbTypeStr == "ll") lfbType.selected = 0;
+	else if (lfbTypeStr == "l") lfbType.selected = 1;
+	else if (lfbTypeStr == "cl") lfbType.selected = 2;
+	else if (lfbTypeStr == "b") lfbType.selected = 3;
+	else setType = false;
+	if (setType)
+		selectType();
+	
 	//set max frags
 	maxFragsSlider.i = ilog2((stringToInt(benchmark.getStr("max")))/8);
 	changeMaxFrags();
@@ -653,6 +664,8 @@ int main(int argc, char* argv[])
 	//currentScene = drawQuads;
 	
 	gui.drawSpeedup = false;
+	
+	//ShaderBuild::printProcessed = true;
 	
 	jeltz.run();
 	return 0;

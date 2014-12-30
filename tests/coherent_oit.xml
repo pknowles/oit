@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<benchmark>
+	
+	max: 64
+	lfb: ll
+	
+	PACK: 1
+	TILES: 0
+	BMA: 0
+	PRESORT: 0
+	MERGESORT: 0
+	REGISTERSORT: 0
+	BSLMEM: 0
+	BSGMEM: 0
+	BSBASE: 0
+	CUDA: 0
+	SHAREDSORT: 0
+	PASS: 0
+	
+	<warmup time="4.0 10.0" frames="5 100" />
+	<duration time="4.0 20.0" frames="10 100" />
+	
+	<test name="atrium" disabled="0">
+		scene: atrium
+		<sync>
+			max: 64, 32
+			view: 0, 1
+		</sync>
+		TILES: 0, 1
+		PRESORT: 0, 1
+		lfb: ll, l, cl
+	</test>
+	<test name="planes2" disabled="0">
+		max: 128
+		scene: planes2
+		view: 0, 1
+		TILES: 0, 1
+		PRESORT: 0, 1
+		lfb: ll, l, cl
+	</test>
+	<test name="hairball" disabled="1">
+		max: 256
+		scene: hairball
+		view: 0, 1
+		TILES: 0, 1
+		PRESORT: 0, 1
+		lfb: ll, l, cl
+	</test>
+</benchmark>
