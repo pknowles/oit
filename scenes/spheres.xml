@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<scene>
+<scene name="spheres">
 	<mesh name="sphere">
 		<gen type="sphere" dimx="16" dimy="8" />
 		<material colour="1 1 1 0.3" />
@@ -7,4 +7,9 @@
 	<object mesh="sphere" resize-cover="0 10 0" position="4 0 0"/>
 	<object mesh="sphere" resize-cover="0 10 0" position="-4 0 0"/>
 	<object mesh="sphere" resize-cover="0 10 0"/>
+	<view name="view1">
+	0.137331 -0.502532 1.09869
+	-0.584859 2.42381 0
+	18.4659
+	</view>
 </scene>

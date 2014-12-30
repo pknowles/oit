@@ -9,6 +9,9 @@
 
 #define IS_BMA_SHADER (MAX_FRAGS_OVERRIDE != 0)
 
+//We read the linearized LFB in reverse order to make them match the linked list LFB order
+#define LFB_L_REVERSE 1
+
 #include "lfb.glsl"
 #include "util.glsl"
 
@@ -31,7 +34,7 @@ LFB_FRAG_TYPE frags[MAX_FRAGS];
 out vec4 fragColour;
 
 #define INDEX_WITH_TILES set_by_app
-#define INDEX_TILE_SIZE 4,8
+#define INDEX_TILE_SIZE 2,8
 
 #define PRESORT_SORT 0
 #define PRESORT_REUSE 0

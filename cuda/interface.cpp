@@ -10,7 +10,7 @@
 #include <lfb/lfbL.h>
 #include <lfb/lfbLL.h>
 
-static my_demand<OIT_CUDA> instance;
+static pyarlib::on_demand<OIT_CUDA> instance;
 
 OIT_CUDA* getOIT_CUDA()
 {

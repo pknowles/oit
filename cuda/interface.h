@@ -19,11 +19,11 @@ struct GPUBuffer;
 typedef OIT_CUDA* (*getOIT_CUDA_FPTR)();
 OC_DLL_EXPORT OIT_CUDA* getOIT_CUDA();
 
-template<typename T> class my_demand;
+template<typename T> struct my_demand;
 
 class OIT_CUDA
 {
-	friend class my_demand<OIT_CUDA>;
+	friend struct pyarlib::on_demand<OIT_CUDA>;
 	OIT_CUDA();
 	bool error;
 	void init();

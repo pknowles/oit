@@ -5,7 +5,7 @@ Visual studio *spit* *spit* *spit* steps:
 1. Add entire pyarlib directory to a pyarlib library project or your main executable
 2. Add resources.rc to your main executable
 3. Include these libraries (project properties->linker->input->additional dependecies):
-	glew32.lib;freetype248.lib;SDL13.lib;libpng.lib;zlib.lib;opengl32.lib;glu32.lib;openctm.lib
+	glew32.lib;freetype248.lib;SDL2.lib;libpng.lib;zlib.lib;opengl32.lib;glu32.lib
 4. Some files (currently just "pyarlib/mesh/simpleobj/obj.c") need to be compiled as C++
 	project properties->C++->advanced->compile as
 5. Build (this file, template.txt, is an example main.cpp file)
@@ -16,7 +16,10 @@ Visual studio *spit* *spit* *spit* steps:
 #include <pyarlib/benchmark.h>
 #include <pyarlib/scene.h>
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <signal.h>
 
 #include "oit.h"
@@ -125,7 +128,7 @@ void updateBenchmark()
 	std::string sceneName = benchmark.getStr("scene");
 	if (sceneName.size())
 		changeScene("scenes/" + sceneName + ".xml");
-	else
+	else if (benchmark.running)
 		printf("\n\n\n########## ERROR: INVALID SCENE NAME (%s) ##########\n\n\n", sceneName.c_str());
 	benchmark.ignoreNextUpdate();
 	
@@ -261,8 +264,10 @@ void update(float dt)
 	
 	if (jeltz.resized() /* && !benchmark.running */)
 	{
-		if (rtt.resize(jeltz.winSize()))      //// ############# LOW REZ HERE
+		if (rtt.resize(jeltz.winSize()/*>>5*/))      //// ############# LOW REZ DEBUG VIEW HERE
 			rtt.attach();
+		debugView.setAspectRatio(jeltz.winSize().x / (float)jeltz.winSize().y);
+		debugView.regenProjection();
 	}
 	
 	static float reloadTimer = 0.0f;
@@ -469,10 +474,12 @@ static void hdl (int sig, siginfo_t *siginfo, void *context)
 			(long)siginfo->si_pid, (long)siginfo->si_uid);
 }
 
+/*
 #include <dlfcn.h>
 #include "cuda/interface.h"
 
 Shader s("s");
+*/
 
 int main(int argc, char* argv[])
 {
@@ -570,9 +577,9 @@ int main(int argc, char* argv[])
 	dragon.upload();
 	*/
 	
-	printf("Polygons: %i\n", dragon.numPolygons);
-	printf("Indices: %i\n", dragon.numIndices);
-	printf("Vertices: %i\n", dragon.numVertices);
+	//printf("Polygons: %i\n", dragon.numPolygons);
+	//printf("Indices: %i\n", dragon.numIndices);
+	//printf("Vertices: %i\n", dragon.numVertices);
 	
 	benchmark.setDefault("max", 64);
 	
