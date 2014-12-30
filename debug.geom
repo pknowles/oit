@@ -30,8 +30,8 @@ void main()
 	#endif
 	
 	vec2 clipCoordA = 2.0 * vec2(coord-0.5) / vec2(lfbInfolfb.size) - 1.0f;
-	vec2 clipCoordB = 2.0 * vec2(coord.x,coord.y+2) / vec2(lfbInfolfb.size) - 1.0f;
-	vec2 clipCoordC = 2.0 * vec2(coord.x+2,coord.y) / vec2(lfbInfolfb.size) - 1.0f;
+	vec2 clipCoordB = 2.0 * vec2(coord.x-0.5,coord.y+1.5) / vec2(lfbInfolfb.size) - 1.0f;
+	vec2 clipCoordC = 2.0 * vec2(coord.x+1.5,coord.y-0.5) / vec2(lfbInfolfb.size) - 1.0f;
 	
 	LFB_INIT(lfb, fragIndex);
 	

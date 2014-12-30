@@ -265,8 +265,10 @@ void update(float dt)
 	
 	if (jeltz.resized() /* && !benchmark.running */)
 	{
-		if (rtt.resize(jeltz.winSize()))      //// ############# LOW REZ HERE
+		if (rtt.resize(jeltz.winSize()/*>>5*/))      //// ############# LOW REZ DEBUG VIEW HERE
 			rtt.attach();
+		debugView.setAspectRatio(jeltz.winSize().x / (float)jeltz.winSize().y);
+		debugView.regenProjection();
 	}
 	
 	static float reloadTimer = 0.0f;
