@@ -2,7 +2,7 @@
 <scene>
 	<mesh name="plane4x4">
 		<gen type="plane" dimx="4" dimy="4" />
-		<material colour="1 1 1 0.05" diffuse="../../images/tigre.png" />
+		<material colour="0.6 0.6 0.6 0.05" diffuse="../../images/tigre.png" />
 	</mesh>
 	<strip mesh="plane4x4" count="128" scale="0.4 0.4 0.4" position="-0.2 -0.2 -0.2" last-position="-0.2 -0.2 0.2" deorder="0"/>
 	<view name="front-df2b">
@@ -11,6 +11,16 @@
 	0.7
 	</view>
 	<view name="back-db2f">
+	0 0 0
+	0 3.14159265359 0
+	0.7
+	</view>
+	<view name="front-df2b-orth" projection="orthographic" orth_size="1">
+	0 0 0
+	0 0 0
+	0.7
+	</view>
+	<view name="back-db2f-orth" projection="orthographic" orth_size="1">
 	0 0 0
 	0 3.14159265359 0
 	0.7

@@ -58,6 +58,7 @@ const char* sceneFiles[] = {
 	"scenes/powerplant.xml",
 	"scenes/hairball.xml",
 	"scenes/tree.xml",
+	"scenes/planes2.xml",
 	};
 
 bool directionalLight = true;
@@ -122,6 +123,18 @@ void changeScene(std::string sceneFile)
 	changeView();
 }
 
+void reshape(vec2i size)
+{
+	//if (rtt.resize(size >> 5))      //// ############# LOW REZ DEBUG VIEW HERE
+	//if (rtt.resize(size << 1))
+	if (rtt.resize(size))
+		rtt.attach();
+	debugView.setAspectRatio(size.x / (float)size.y);
+	debugView.regenProjection();
+	if (size != jeltz.winSize())
+		printf("Note: render size does not match window.\n");
+}
+
 void updateBenchmark()
 {
 	//change scene if needed
@@ -131,6 +144,14 @@ void updateBenchmark()
 	else if (benchmark.running)
 		printf("\n\n\n########## ERROR: INVALID SCENE NAME (%s) ##########\n\n\n", sceneName.c_str());
 	benchmark.ignoreNextUpdate();
+	
+	//set resolution
+	int resx = (int)benchmark.get("resx", 0);
+	int resy = (int)benchmark.get("resy", 0);
+	if (resx > 0 && resy > 0)
+		reshape(vec2i(resx, resy));
+	if (benchmark.running)
+		benchmark.currentTest()->overrideOutput("pixels", rtt.size.x * rtt.size.y);
 	
 	//change lfb type
 	std::string lfbTypeStr = benchmark.getStr("lfb");
@@ -267,18 +288,12 @@ void update(float dt)
 	if (jeltz.buttonDown("l"))
 		directionalLight = !directionalLight;
 		
-	if (jeltz.buttonDown("1")) changeScene(sceneFiles[0]);
-	if (jeltz.buttonDown("2")) changeScene(sceneFiles[1]);
-	if (jeltz.buttonDown("3")) changeScene(sceneFiles[2]);
-	if (jeltz.buttonDown("4")) changeScene(sceneFiles[3]);
-	if (jeltz.buttonDown("5")) changeScene(sceneFiles[4]);
+	for (int i = 0; i < (int)(sizeof(sceneFiles)/sizeof(char*)); ++i)
+		if (jeltz.buttonDown(intToString(i+1).c_str())) changeScene(sceneFiles[i]);
 	
-	if (jeltz.resized() /* && !benchmark.running */)
+	if (jeltz.resized() && !benchmark.running)
 	{
-		if (rtt.resize(jeltz.winSize()/*>>5*/))      //// ############# LOW REZ DEBUG VIEW HERE
-			rtt.attach();
-		debugView.setAspectRatio(jeltz.winSize().x / (float)jeltz.winSize().y);
-		debugView.regenProjection();
+		reshape(jeltz.winSize());
 	}
 	
 	static float reloadTimer = 0.0f;
@@ -306,7 +321,7 @@ void update(float dt)
 			for (size_t i = 0; i < h.size(); ++i)
 				hfile << i << "," << h[i] << std::endl;
 			hfile.close();
-			printf("Max DC: %i\n", h.size()-1);
+			printf("Max DC: %i\n", (int)(h.size()-1));
 			printf("Frags: %i\n", oit.getTotalFragments());
 		}
 		else
@@ -314,8 +329,24 @@ void update(float dt)
 	}
 	
 	if (jeltz.buttonDown("b"))
+	{
+		jeltz.removeBorder();
+		std::string vendor((const char*)glGetString(GL_VENDOR));
+		std::string renderer((const char*)glGetString(GL_RENDERER));
+		std::string version((const char*)glGetString(GL_VERSION));
+		benchmark.setDefault("device", renderer + " GL" + version);
 		benchmark.start();
+	}
 	benchmark.update(dt);
+	
+	if (benchmark.running)
+	{
+		benchmark.currentTest()->overrideOutput("memory_mb", (int)(oit.getMemoryUsage()));
+		benchmark.currentTest()->overrideOutput("tmemory_mb", (int)(getGPUMemoryUsage()));
+	}
+	
+	if (jeltz.buttonDown("F3"))
+		jeltz.removeBorder(!jeltz.getBorderless());
 }
 
 void drawQuads(Shader* shader)
@@ -434,10 +465,13 @@ void display()
 		
 		visView.setDistance(0.1f, 200.0f);
 		visView.setPerspective(90.0f * pi / 180.0f);
+		//visView.setOrthographic(32.0f);
 		visView.regen();
 		
 		sceneView.setDistance(2.0f, 20.0f);
 		sceneView.setPerspective(40.0f * pi / 180.0f);
+		//sceneView.setDistance(2.0f, 8.0f);
+		//sceneView.setOrthographic(12.0f);
 		sceneView.regen();
 	}
 	if (usingDebugCamera)
@@ -479,13 +513,12 @@ void display()
 }
 
 
+/*
 static void hdl (int sig, siginfo_t *siginfo, void *context)
 {
 	printf ("Sending PID: %ld, UID: %ld\n",
 			(long)siginfo->si_pid, (long)siginfo->si_uid);
 }
-
-/*
 #include <dlfcn.h>
 #include "cuda/interface.h"
 

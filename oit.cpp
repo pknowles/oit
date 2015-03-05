@@ -299,6 +299,8 @@ void OIT::compositeFromLFB()
 		
 		if (profiler) profiler->time("Reuse");
 		
+		if (profiler) profiler->start("Fix");
+		
 		if ((*this)["BMA"])
 		{
 			createBMAMask();
@@ -539,6 +541,11 @@ int OIT::getTotalFragments()
 	return lfb->getTotalFragments();
 }
 
+size_t OIT::getMemoryUsage()
+{
+	return lfb->getMemoryUsage();
+}
+	
 int OIT::numOptimizations()
 {
 	return (int)optimizations.size();

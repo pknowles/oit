@@ -3,6 +3,7 @@
 	
 	max: 64
 	lfb: ll
+	view: 0
 	
 	PACK: 1
 	TILES: 0
@@ -20,30 +21,65 @@
 	<warmup time="4.0 10.0" frames="5 100" />
 	<duration time="4.0 20.0" frames="10 100" />
 	
+	<test name="memory" disabled="1">
+		<warmup time="1.0 2.0" frames="1 3" />
+		<duration time="1.0 2.0" frames="1 3" />
+		scene: atrium
+		lfb: l, cl
+		TILES: 1
+		<sync>
+			<!-- linear pixel area increase via resolution (1/10 to 10/10 HD 1080p) -->
+			resx: 607, 858, 1051, 1214, 1357, 1487, 1606, 1717, 1821, 1920
+			resy: 341, 482,  591,  683,  763,  836,  903,  965, 1024, 1080
+		</sync>
+	</test>
+	<test name="resolution" disabled="0">
+		<!--
+		<warmup time="1.0 2.0" frames="5 10" />
+		<duration time="1.0 2.0" frames="10 50" />
+		-->
+		lfb: cl
+		scene: atrium
+		TILES: 1
+		PRESORT: 1, 0
+		<sync>
+			<!-- linear pixel area increase via resolution (1/10 to 10/10 HD 1080p) -->
+			resx: 607, 858, 1051, 1214, 1357, 1487, 1606, 1717, 1821, 1920
+			resy: 341, 482,  591,  683,  763,  836,  903,  965, 1024, 1080
+		</sync>
+	</test>
 	<test name="atrium" disabled="0">
 		scene: atrium
+		TILES: 0, 1
+		PRESORT: 1, 0
+		lfb: ll, l, cl
 		<sync>
 			max: 64, 32
 			view: 0, 1
 		</sync>
-		TILES: 0, 1
-		PRESORT: 0, 1
-		lfb: ll, l, cl
 	</test>
 	<test name="planes2" disabled="0">
 		max: 128
 		scene: planes2
-		view: 0, 1
 		TILES: 0, 1
-		PRESORT: 0, 1
+		PRESORT: 1, 0
+		lfb: ll, l, cl
+		view: 0, 1, 2, 3
+	</test>
+	<test name="powerplant" disabled="0">
+		max: 512
+		scene: powerplant
+		view: 0
+		TILES: 0, 1
+		PRESORT: 1, 0
 		lfb: ll, l, cl
 	</test>
-	<test name="hairball" disabled="1">
+	<test name="hairball" disabled="0">
 		max: 256
 		scene: hairball
 		view: 0, 1
 		TILES: 0, 1
-		PRESORT: 0, 1
-		lfb: ll, l, cl
+		PRESORT: 1, 0
+		lfb: ll, l
 	</test>
 </benchmark>

@@ -115,7 +115,7 @@ void reuseSort(int fragIndex)
 	if (fragIndex == centreIndex)
 		fragColour.rgb = mix(fragColour.rgb, vec3(0,1,0), 0.5);
 	else
-		fragColour.rgb = mix(fragColour.rgb, vec3(0,0,1), 0.1);
+		fragColour.rgb = mix(fragColour.rgb, vec3(0,0,1), 0.5);
 	//fragColour.rgb = heat((fragIndex % 123)/123.0);
 	//fragColour.rgb = heat(float(fragCount)/MAX_FRAGS);
 	//discard;

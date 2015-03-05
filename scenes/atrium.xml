@@ -4,6 +4,7 @@
 		<file src="sponza/sponza.3ds"/>
 	</mesh>
 	<object backface="0" mesh="atrium" resize-cover="0 10 0"/>
+	<!-- <object backface="0" mesh="atrium" resize-cover="0 10 0" position="0.1 0.1 0.1"/> -->
 	<view name="balcony-dc50">
 	0.137331 -0.502532 1.09869
 	-0.061265 -0.159267 0

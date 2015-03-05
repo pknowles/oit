@@ -66,6 +66,7 @@ public:
 	void setLFBType(LFB::LFBType type);
 	void setMaxFrags(int frags);
 	int getMaxFrags();
+	size_t getMemoryUsage(); //memory in GPU buffers only
 	void setProfiler(Profiler* p);
 	void draw(void (*scene)(Shader*), Shader* shader);
 	int getTotalFragments();

@@ -93,7 +93,7 @@ void main()
 	//fragColour.rgb = mix(fragColour.rgb, debugColLog(MAX_FRAGS), 0.25);
 	float dc = MAX_FRAGS_OVERRIDE/float(_MAX_FRAGS);
 	dc = sqrt(dc);
-	//fragColour.rgb = mix(vec3(avg(fragColour.rgb)), heat(dc), 0.25);
+	fragColour.rgb = mix(vec3(avg(fragColour.rgb)), heat(dc), 0.25);
 	//fragColour.rgb *= fragColour.rgb * fragColour.rgb;
 	#endif
 	
