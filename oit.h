@@ -13,6 +13,7 @@
 class Camera;
 class Shader;
 class Profiler;
+class LFBBase;
 
 class OIT
 {
@@ -76,6 +77,7 @@ public:
 	std::string info();
 	bool getDepthHistogram(std::vector<unsigned int>& histogram); //requires using an LFB and optimization that uses per-pixel counts
 	void drawDebug(Camera* source, Camera* view);
+	const LFBBase* getLFB();
 };
 
 #endif

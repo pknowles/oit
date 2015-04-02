@@ -585,5 +585,9 @@ void OIT::drawDebug(Camera* source, Camera* view)
 	debugShader.unuse();
 }
 
+const LFBBase* OIT::getLFB()
+{
+	return (LFBBase*)lfb;
+}
 
 

@@ -50,6 +50,8 @@ void main()
 	//fragColour.a = 1.0-abs(N.z);
 	//fragColour.a *= 0.5;
 
-	addFragment(lfb, index, make_lfb_data(vec2(rgba8ToFloat(fragColour), gl_FragCoord.z)));
+	//float d = gl_FragCoord.z;
+	float d = -esFrag.z;
+	addFragment(lfb, index, make_lfb_data(vec2(rgba8ToFloat(fragColour), d)));
 }
 

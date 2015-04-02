@@ -347,6 +347,9 @@ void update(float dt)
 	
 	if (jeltz.buttonDown("F3"))
 		jeltz.removeBorder(!jeltz.getBorderless());
+		
+	if (jeltz.buttonDown("p"))
+		oit.getLFB()->save("oit.lfb");
 }
 
 void drawQuads(Shader* shader)
