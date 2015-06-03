@@ -375,6 +375,7 @@ void OIT::setDefines(Shader* shader)
 void OIT::updateShaders()
 {
 	printf("====== Updating Shaders ======\n");
+	fflush(stdout);
 
 	dirtyShaders = false;
 

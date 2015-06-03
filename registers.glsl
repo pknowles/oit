@@ -220,8 +220,21 @@ void sortAndCompositeRegisters(int fragIndex)
 	#define IF_FRAGS_32(x) if (x)
 	#define BLEND_32(i) if (fragCount > i) BLEND(i)
 	#endif
+	
+	#if OPT_OUT_IFS && IS_BMA_SHADER && MAX_FRAGS > 64
+	#define IF_FRAGS_64(x)
+	#define BLEND_64(i) BLEND(i)
+	#else
+	#define IF_FRAGS_64(x) if (x)
+	#define BLEND_64(i) if (fragCount > i) BLEND(i)
+	#endif
+	
+	
+	#include "registersExplicit.glsl"
 
+/*
 	//BEGIN GENERATED
+	
 LFB_FRAG_TYPE frag0,frag1,frag2,frag3,frag4,frag5,frag6,frag7
         #if MAX_FRAGS > 8
         ,frag8,frag9,frag10,frag11,frag12,frag13,frag14,frag15
@@ -433,5 +446,6 @@ BLEND_16(15);BLEND_16(14);BLEND_16(13);BLEND_16(12);BLEND_16(11);BLEND_16(10);BL
 #endif
 BLEND_8(7);BLEND_8(6);BLEND_8(5);BLEND_8(4);BLEND_8(3);BLEND_8(2);BLEND_8(1);BLEND_8(0);
 	//END GENERATED
+	*/
 }
 #endif

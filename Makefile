@@ -111,8 +111,8 @@ cleaner: clean
 	@$(MAKE) clean --no-print-directory -C cuda
 	@echo -cuda
 
-%.glsl : %.glsl.gen
-	echo -e "from jina2 import Template as T\nprint T(open(\"$<\").read()).render()" | python > $@
+%.glsl : %.glsl.jin
+	echo -e "from jinja2 import Template as T\nprint T(open(\"$<\").read(),trim_blocks=True,lstrip_blocks=True).render()" | python > $@
 
 
 
