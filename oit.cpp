@@ -44,6 +44,7 @@ typedef void (APIENTRYP PFNGLDISPATCHCOMPUTEINDIRECTPROC) (GLintptr indirect);
 static Shader depthOnly("count");
 static Shader writeBMAMask("bmaMask");
 static Shader debugShader("debug");
+static Shader patternRecord("pattern");
 
 OIT::Optimization::Optimization() : parent(NULL), enabled(false)
 {
@@ -589,5 +590,92 @@ const LFBBase* OIT::getLFB()
 {
 	return (LFBBase*)lfb;
 }
+
+std::vector<vec2i> OIT::computeRasterPattern()
+{
+	std::vector<vec2i> pattern;
+
+	vec4i vp;
+	int layers = 4;
+	glGetIntegerv(GL_VIEWPORT, (GLint*)&vp);
+	
+	TextureBuffer positions(GL_RG32UI);
+	positions.resize(sizeof(vec2i) * vp.z * vp.w * layers);
+	
+	TextureBuffer counter;
+	counter.resize(sizeof(unsigned int));
+	*(unsigned int*)counter.map() = 0;
+	counter.unmap();
+	
+	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, counter);
+	
+	patternRecord.use();
+	patternRecord.set("positions", positions);
+	drawSSQuad(vec3i(vp.z, vp.w, layers));
+	patternRecord.unuse();
+	
+	typedef std::basic_string<unsigned int> BigStr;
+	std::map<BigStr, int> freq;
+	
+	unsigned int c = *(unsigned int*)counter.map();
+	counter.unmap();
+	vec2i* p = (vec2i*)positions.map();
+	vec2i last = p[0];
+	BigStr str;
+	for (int i = 1; i < c; ++i)
+	{
+		vec2i d = p[i] - last;
+		last = p[i];
+		if (myabs(d.x) > 32 || myabs(d.y) > 32)
+		{
+			str.clear();
+			continue;
+		}
+		
+		unsigned short x = d.x+127;
+		unsigned short y = d.y+127;
+		unsigned int e = x | (y << 16);
+		str += e;
+		
+		if (str.size() > 32)
+		{
+			for (size_t j = 0; j < str.size()-32; ++j)
+			{
+				BigStr sub = str.substr(j);
+				if (freq.find(sub) == freq.end())
+					freq[sub] = 1;
+				else
+					++freq[sub];
+			}
+		}
+		
+		if (str.size() > 256)
+			str.clear();
+	}
+	positions.unmap();
+	
+	int maxFreq = 0;
+	for (std::map<BigStr, int>::iterator it = freq.begin(); it != freq.end(); ++it)
+		maxFreq = mymax(maxFreq, it->second);
+	
+	BigStr maxLen;
+	for (std::map<BigStr, int>::iterator it = freq.begin(); it != freq.end(); ++it)
+	{
+		if (it->second == maxFreq && it->first.size() > maxLen.size())
+			maxLen = it->first;
+	}
+	
+	for (size_t i = 0; i < maxLen.size(); ++i)
+	{
+		unsigned short x = maxLen[i] & 0xFFFF;
+		unsigned short y = (maxLen[i] >> 16) & 0xFFFF;
+		pattern.push_back(vec2i(x-127, y-127));
+	}
+	
+	positions.release();
+	counter.release();
+	return pattern;
+}
+
 
 

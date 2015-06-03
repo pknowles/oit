@@ -499,6 +499,46 @@ void display()
 		out.saveImage(outName);
 	}
 	
+	if (jeltz.buttonDown("o"))
+	{
+		std::vector<vec2i> pattern = oit.computeRasterPattern();
+		std::vector<vec2i> positions;
+		vec2i p(0);
+		positions.push_back(p);
+		for (size_t i = 0; i < pattern.size(); ++i)
+		{
+			p += pattern[i];
+			positions.push_back(p);
+		}
+		vec2i minp(999), maxp(-999);
+		for (size_t i = 0; i < positions.size(); ++i)
+		{
+			minp = vmin(minp, positions[i]);
+			maxp = vmax(maxp, positions[i]);
+		}
+		for (size_t i = 0; i < positions.size(); ++i)
+			positions[i] -= minp;
+		maxp -= minp;
+		for (size_t i = 0; i < positions.size(); ++i)
+		{
+			for (size_t j = 0; j < i; ++j)
+				if (positions[i] == positions[j])
+					printf("DUPLICATE!\n");
+		}
+		for (int y = maxp.y; y >= 0; --y)
+		{
+			for (int x = 0; x <= maxp.x; ++x)
+			{
+				int n = -1;
+				for (size_t i = 0; i < positions.size(); ++i)
+					if (positions[i] == vec2i(x, y))
+						n = i;
+				printf("%02i ", n);
+			}
+			printf("\n");
+		}
+	}
+	
 	#if 0
 	glClear(GL_DEPTH_BUFFER_BIT);
 	fly.uploadCamera();

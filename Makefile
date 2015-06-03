@@ -51,8 +51,8 @@ prof: CFLAGS+= -pg
 prof: export CFLAGS_R+= -pg
 prof: all
 
-opt: CFLAGS+= -03
-opt: export CFLAGS_R+= -03
+opt: CFLAGS+= -O3
+opt: export CFLAGS_R+= -O3
 opt: all
 
 ALL_SUBLIBS= $(SUBLIBS)
@@ -67,7 +67,7 @@ echodeps:
 	@echo $(ALL_SUBLIBS)
 
 #linking/archiving the target
-$(TARGET): $(SUBLIBS) $(OBJECTS)
+$(TARGET): $(SUBLIBS) $(OBJECTS) registersExplicit.glsl
 	@echo linking $(TARGET)
 	$(LD) -o $(TARGET) $(OBJECTS) $(ALL_SUBLIBS) $(LFLAGS) `[[ $(NOCUDA) == 1 ]] || echo $(CUDA_OBJECTS) $(CUDA_LIBS)`
 
@@ -111,7 +111,8 @@ cleaner: clean
 	@$(MAKE) clean --no-print-directory -C cuda
 	@echo -cuda
 
-
+%.glsl : %.glsl.gen
+	echo -e "from jina2 import Template as T\nprint T(open(\"$<\").read()).render()" | python > $@
 
 
 

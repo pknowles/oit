@@ -5,7 +5,7 @@ layout(triangle_strip, max_vertices = 30) out;
 #include "lfb.glsl"
 #include "util.glsl"
 
-#define INDEX_WITH_TILES set_by_app
+#define INDEX_WITH_TILES 0
 #define INDEX_TILE_SIZE 4,8
 
 uniform mat4 projectionMat;
