@@ -49,9 +49,7 @@ IF_FRAGS_{{ b }}(LFB_ITER_CONDITION(lfb)) {fragCount = {{ i + 1 }}; frag{{ i }} 
 IF_FRAGS_{{ b }}(fragCount > {{ i }}) {{ "{" }}{% if i < 32 %}
 {% for j in range(i, 0, -1) %}SWAP_INS({{ j-1 }},{{ j }}){% endfor %}{{ "}"*i }}
 {% else %}
-{% for j in range(i, 0, -1) %}SWAP({{ j-1 }},{{ j }});{% endfor %}
-{% endif %}
-{% if i >= 32 %}{{ "}" }}
+{% for j in range(i, 0, -1) %}{% if (loop.index+1) % (maxfrags//32) == 0 %}SWAP_INS{% else %}SWAP{% endif %}({{ j-1 }},{{ j }});{% endfor %}{{ "}"*(1+((i+1)*32)//maxfrags) }}
 {% endif %}
 {% endfor %}
 #endif
