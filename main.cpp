@@ -349,7 +349,11 @@ void update(float dt)
 		jeltz.removeBorder(!jeltz.getBorderless());
 		
 	if (jeltz.buttonDown("p"))
+	{
+		printf("Writing out.lfb...\n");
 		oit.getLFB()->save("oit.lfb");
+		printf("done\n");
+	}
 }
 
 void drawQuads(Shader* shader)
@@ -459,7 +463,7 @@ void display()
 		oit.draw(currentScene, &phong);
 	rtt.unbind();
 	
-	if (jeltz.buttonDown("f"))
+	if (jeltz.buttonDown("f") && !usingDebugCamera)
 	{
 		debugView = fly.camera;
 		
@@ -471,10 +475,13 @@ void display()
 		//visView.setOrthographic(32.0f);
 		visView.regen();
 		
+		#if 0
 		sceneView.setDistance(2.0f, 20.0f);
 		sceneView.setPerspective(40.0f * pi / 180.0f);
-		//sceneView.setDistance(2.0f, 8.0f);
-		//sceneView.setOrthographic(12.0f);
+		#else
+		sceneView.setDistance(2.0f, 14.0f);
+		sceneView.setOrthographic(12.0f);
+		#endif
 		sceneView.regen();
 	}
 	if (usingDebugCamera)

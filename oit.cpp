@@ -574,11 +574,12 @@ void OIT::drawDebug(Camera* source, Camera* view)
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-	mat44 projection = view->getProjection() * view->getInverse() * source->getTransform() * source->getProjectionInv();
 	setDefines(&debugShader);
 	debugShader.use();
 	lfb->setUniforms(debugShader, "lfb");
-	debugShader.set("projectionMat", projection);
+	debugShader.set("reprojectMat", view->getProjection() * view->getInverse() * source->getTransform() * source->getProjectionInv());
+	debugShader.set("sourceProjectionInv", source->getProjectionInv());
+	debugShader.set("sourceCameraToClip", view->getProjection() * view->getInverse() * source->getTransform());
 	for (int i = 0; i < getMaxFrags(); i += 10)
 	{
 		debugShader.set("batch", i);

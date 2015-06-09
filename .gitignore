@@ -1,5 +1,6 @@
 oit
 *.bin
+*.lfb
 
 #cuda intermediates
 *.i
