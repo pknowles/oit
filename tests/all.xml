@@ -19,11 +19,11 @@
 	<warmup time="4.0 10.0" frames="5 100" />
 	<duration time="4.0 20.0" frames="10 100" />
 	
-	<test name="powerplant" disabled="0">
-		scene: powerplant
+	<test name="atrium" disabled="0">
+		scene: atrium
 		<sync>
-			max: 512, 256, 128
-			view: 0, 2, 4
+			max: 64, 32
+			view: 0, 1
 		</sync>
 		<sync range="2:">
 			MERGESORT: 0, 0,   0, 1, 0, 0,   0, 1, 0,   0, 1, 0
@@ -34,11 +34,11 @@
 			PASS:      1, 1,   0, 0, 0, 0,   0, 0, 0,   0, 0, 0
 		</sync>
 	</test>
-	<test name="atrium" disabled="0">
-		scene: atrium
+	<test name="powerplant" disabled="0">
+		scene: powerplant
 		<sync>
-			max: 64, 32
-			view: 0, 1
+			max: 512, 256, 128
+			view: 0, 2, 4
 		</sync>
 		<sync range="2:">
 			MERGESORT: 0, 0,   0, 1, 0, 0,   0, 1, 0,   0, 1, 0
