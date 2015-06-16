@@ -21,7 +21,7 @@
 	<warmup time="4.0 10.0" frames="5 100" />
 	<duration time="4.0 20.0" frames="10 100" />
 	
-	<test name="memory" disabled="1">
+	<test name="memory" disabled="0">
 		<warmup time="1.0 2.0" frames="1 3" />
 		<duration time="1.0 2.0" frames="1 3" />
 		scene: atrium

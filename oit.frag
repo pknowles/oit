@@ -79,7 +79,7 @@ void main()
 		#if COMPOSITE_ONLY
 		compositeOnly(fragIndex);
 		#else
-			#if (SORT_IN_REGISTERS || SORT_IN_BOTH) && MAX_FRAGS <= 32
+			#if (SORT_IN_REGISTERS || SORT_IN_BOTH) && MAX_FRAGS <= 64
 			sortAndCompositeRegisters(fragIndex);
 			#elif SORT_IN_BOTH
 			sortAndCompositeBlocks(fragIndex);

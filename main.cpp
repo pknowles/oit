@@ -26,6 +26,8 @@ Visual studio *spit* *spit* *spit* steps:
 
 using namespace pyarlib;
 
+bool startBenchmarkImmediately = false;
+
 Jeltz jeltz("Jeltz");
 JeltzFly fly;
 JeltzGUI gui;
@@ -79,6 +81,7 @@ void selectType()
 	case 1: oit.setLFBType(LFB::LFB_TYPE_L); break;
 	case 2: oit.setLFBType(LFB::LFB_TYPE_CL); break;
 	case 3: oit.setLFBType(LFB::LFB_TYPE_B); break;
+	case 4: oit.setLFBType(LFB::LFB_TYPE_PLL); break;
 	}
 }
 
@@ -160,6 +163,7 @@ void updateBenchmark()
 	else if (lfbTypeStr == "l") lfbType.selected = 1;
 	else if (lfbTypeStr == "cl") lfbType.selected = 2;
 	else if (lfbTypeStr == "b") lfbType.selected = 3;
+	else if (lfbTypeStr == "pll") lfbType.selected = 4;
 	else setType = false;
 	if (setType)
 		selectType();
@@ -327,10 +331,10 @@ void update(float dt)
 		else
 			printf("ERROR: No counts for histogram\n");
 	}
-	
-	if (jeltz.buttonDown("b"))
+
+	if (jeltz.buttonDown("b") || startBenchmarkImmediately)
 	{
-		jeltz.removeBorder();
+		startBenchmarkImmediately = false;
 		std::string vendor((const char*)glGetString(GL_VENDOR));
 		std::string renderer((const char*)glGetString(GL_RENDERER));
 		std::string version((const char*)glGetString(GL_VERSION));
@@ -341,12 +345,15 @@ void update(float dt)
 	
 	if (benchmark.running)
 	{
-		benchmark.currentTest()->overrideOutput("memory_mb", (int)(oit.getMemoryUsage()));
-		benchmark.currentTest()->overrideOutput("tmemory_mb", (int)(getGPUMemoryUsage()));
+		benchmark.currentTest()->overrideOutput("memory", (int)(oit.getMemoryUsage()));
+		benchmark.currentTest()->overrideOutput("tmemory", (int)(getGPUMemoryUsage()));
+		benchmark.currentTest()->overrideOutput("fragments", oit.getTotalFragments());
 	}
 	
 	if (jeltz.buttonDown("F3"))
 		jeltz.removeBorder(!jeltz.getBorderless());
+	if (jeltz.buttonDown("F4"))
+		jeltz.maximize();
 		
 	if (jeltz.buttonDown("p"))
 	{
@@ -640,10 +647,11 @@ int main(int argc, char* argv[])
 	maxFragsSlider.capture(QG::SCROLL, changeMaxFrags);
 	viewSlider.capture(QG::SCROLL, changeView);
 	
-	lfbType.add("LL-LFB");
-	lfbType.add("L-LFB");
-	lfbType.add("CL-LFB");
-	lfbType.add("B-LFB");
+	lfbType.add("Linked Lists");
+	lfbType.add("Linearized");
+	lfbType.add("Coalesced");
+	lfbType.add("Basic");
+	lfbType.add("Linked Pages");
 	lfbType.capture(QG::SELECT, selectType);
 
 	for (int i = 0; i < oit.numOptimizations(); ++i)
@@ -716,32 +724,40 @@ int main(int argc, char* argv[])
 	}
 */
 	
+	
+	benchmark.callback(updateBenchmark);
+	updateBenchmark();
+	//jeltz.redrawUnfocused();
+
+	benchmark.include(&profiler);
+	oit.setProfiler(&profiler);
+
+	
 	//benchmark.load("tests/sort_registers.xml");
-		
-	if (argc > 1)
+	std::queue<std::string> args;
+	for (int i = 1; i < argc; ++i)
+		args.push(argv[i]);
+
+	if (args.size() > 0)
 	{
-		std::string firstArg(argv[1]);
-		if (basefilepath(firstArg) == "tests/")
+		if (args.front() == "-r")
 		{
+			jeltz.maximize();
+			startBenchmarkImmediately = true;
+			args.pop();
+		}
+		if (basefilepath(args.front()) != "tests/")
+			printf("Warning: given test is not loaded from tests/");
 			//for (int i = 0; i < sizeof(sceneFiles)/sizeof(char*); ++i)
 			//	scene.load(sceneFiles[i]); //prime the scenes
-			benchmark.load(firstArg);
-		}
+		benchmark.load(args.front());
+		args.pop();
 	}
 	
 	alpha.f = 0.3f;
 	
-	
-	benchmark.callback(updateBenchmark);
-	//jeltz.redrawUnfocused();
-	
-	benchmark.include(&profiler);
-	oit.setProfiler(&profiler);
-	
 	rtt.colour[0] = new Texture2D(vec2i(0), GL_RGBA8);
 	rtt.stencil = new Texture2D(vec2i(0), GL_DEPTH24_STENCIL8);
-	
-	updateBenchmark();
 	
 	currentScene = drawScene;
 	//currentScene = drawQuads;
