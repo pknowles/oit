@@ -87,6 +87,7 @@ OIT::OIT()
 	presortTileSize = vec2i(16, 16);
 	indexingTileSize = vec2i(2, 8);
 	
+	optimizations.push_back(Optimization("BINDLESS", "Bindless Graphics", this));
 	optimizations.push_back(Optimization("PACK", "Pack colour to RGBA8", this));
 	optimizations.push_back(Optimization("TILES", "Index by Raster Pattern", this));
 	optimizations.push_back(Optimization("PASS", "No Sorting", this));
@@ -468,6 +469,8 @@ bool OIT::optimizationSet(const std::string& id, bool enabled)
 		if (id == "PRESORT")
 			sortedOrder->release();
 	}
+	
+	lfb->useBindlessGraphics((*this)["BINDLESS"]);
 	
 	lfb->setFormat((*this)["PACK"] ? GL_RG32F : GL_RGBA32F);
 	

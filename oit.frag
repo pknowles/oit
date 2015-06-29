@@ -79,7 +79,7 @@ void main()
 		#if COMPOSITE_ONLY
 		compositeOnly(fragIndex);
 		#else
-			#if (SORT_IN_REGISTERS || SORT_IN_BOTH) && MAX_FRAGS <= 64
+			#if (SORT_IN_REGISTERS || SORT_IN_BOTH) && MAX_FRAGS <= 32
 			sortAndCompositeRegisters(fragIndex);
 			#elif SORT_IN_BOTH
 			sortAndCompositeBlocks(fragIndex);
@@ -95,6 +95,10 @@ void main()
 	dc = sqrt(dc);
 	fragColour.rgb = mix(vec3(avg(fragColour.rgb)), heat(dc), 0.25);
 	//fragColour.rgb *= fragColour.rgb * fragColour.rgb;
+	#endif
+	
+	#ifdef LFB_COUNT
+	//fragColour.rgb = heat(LFB_COUNT(lfb)/float(_MAX_FRAGS));
 	#endif
 	
 	fragColour.a = 1.0;

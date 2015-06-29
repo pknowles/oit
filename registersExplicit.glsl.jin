@@ -1,6 +1,6 @@
 
-{% set maxfrags = 64 %}
-{% set ranges = [(0,8),(8,16),(16,32),(32,64)] %}
+{% set maxfrags = 32 %}
+{% set ranges = [(0,8),(8,16),(16,32)] %}
 
 //declare variables we assume will be placed in registers
 {% for a, b in ranges %}

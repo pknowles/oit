@@ -518,7 +518,7 @@ void sortAndCompositeBlocks(int fragIndex)
 	int reader, writer;
 	
 	LFB_INIT(lfb, fragIndex);
-	reader = writer = int(imageLoad(headPtrslfb, lfbTmplfb.fragIndex).r);
+	reader = writer = LFB_EXPOSE_TABLE_GET(headPtrslfb, lfbTmplfb.fragIndex);
 	
 	LFB_FRAG_TYPE tmp;
 	
@@ -531,12 +531,12 @@ void sortAndCompositeBlocks(int fragIndex)
 		#if 1
 		for (int i = 0; i < MAX_REGISTERS && reader != 0; ++i)
 		{
-			registers[i] = LFB_FRAG_TYPE(imageLoad(datalfb, reader));
-			reader = int(imageLoad(nextPtrslfb, reader).r);
+			registers[i] = LFB_EXPOSE_DATA_GET(datalfb, reader);
+			reader = LFB_EXPOSE_TABLE_GET(nextPtrslfb, reader);
 			++count;
 		}
 		#else
-		#define READ_FRAG(i) registers[i] = LFB_FRAG_TYPE(imageLoad(datalfb, reader)); reader = int(imageLoad(nextPtrslfb, reader).r); ++count;
+		#define READ_FRAG(i) registers[i] = LFB_EXPOSE_DATA_GET(datalfb, reader); reader = LFB_EXPOSE_TABLE_GET(nextPtrslfb, reader); ++count;
 		READ_FRAG(0);
 		if (reader != 0) {READ_FRAG(1);
 		if (reader != 0) {READ_FRAG(2);
@@ -740,11 +740,11 @@ void sortAndCompositeBlocks(int fragIndex)
 		#if 1
 		for (int i = 0; i < MAX_REGISTERS && writer != 0; ++i)
 		{
-			imageStore(datalfb, writer, vec4(registers[i] LFB_FRAG_PAD));
-			writer = int(imageLoad(nextPtrslfb, writer).r);
+			LFB_EXPOSE_DATA_SET(datalfb, writer, registers[i]);
+			writer = LFB_EXPOSE_TABLE_GET(nextPtrslfb, writer);
 		}
 		#else
-		#define WRITE_FRAG(i) imageStore(datalfb, writer, vec4(registers[i] LFB_FRAG_PAD)); writer = int(imageLoad(nextPtrslfb, writer).r);
+		#define WRITE_FRAG(i) LFB_EXPOSE_DATA_SET(datalfb, writer, registers[i]); writer = LFB_EXPOSE_TABLE_GET(nextPtrslfb, writer);
 		WRITE_FRAG(0);
 		if (writer != 0) {WRITE_FRAG(1);
 		if (writer != 0) {WRITE_FRAG(2);
@@ -787,8 +787,8 @@ void sortAndCompositeBlocks(int fragIndex)
 	//prime the n-way merge cache
 	for (int i = 0; i < MERGE_SIZE && i < mergeSize; ++i)
 	{
-		registers[i] = LFB_FRAG_TYPE(imageLoad(datalfb, next[i]));
-		next[i] = int(imageLoad(nextPtrslfb, next[i]).r);
+		registers[i] = LFB_EXPOSE_DATA_GET(datalfb, next[i]);
+		next[i] = LFB_EXPOSE_TABLE_GET(nextPtrslfb, next[i]);
 	}
 	
 	//merge and composite blocks
@@ -812,8 +812,8 @@ void sortAndCompositeBlocks(int fragIndex)
 		{
 			if (n == j)
 			{
-				registers[j] = LFB_FRAG_TYPE(imageLoad(datalfb, next[j]));
-				next[j] = int(imageLoad(nextPtrslfb, next[j]).r);
+				registers[j] = LFB_EXPOSE_DATA_GET(datalfb, next[j]);
+				next[j] = LFB_EXPOSE_TABLE_GET(nextPtrslfb, next[j]);
 				--left[j];
 			}
 		}
