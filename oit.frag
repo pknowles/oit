@@ -44,6 +44,9 @@ out vec4 fragColour;
 
 #if PRESORT_SORT || PRESORT_REUSE
 #include "presort.glsl"
+#else
+//force early fragment tests. seems to be an issue with some drivers
+layout(early_fragment_tests) in;
 #endif
 
 #if SORT_IN_REGISTERS || SORT_IN_BOTH

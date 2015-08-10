@@ -61,6 +61,7 @@ const char* sceneFiles[] = {
 	"scenes/hairball.xml",
 	"scenes/tree.xml",
 	"scenes/planes2.xml",
+	"scenes/ship.xml",
 	};
 
 bool directionalLight = true;
@@ -291,7 +292,7 @@ void update(float dt)
 	
 	if (jeltz.buttonDown("l"))
 		directionalLight = !directionalLight;
-		
+	
 	for (int i = 0; i < (int)(sizeof(sceneFiles)/sizeof(char*)); ++i)
 		if (jeltz.buttonDown(intToString(i+1).c_str())) changeScene(sceneFiles[i]);
 	

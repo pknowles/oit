@@ -21,7 +21,7 @@ void presortFrags()
 	
 	#if 0
 	ivec4 sortOp[MAX_FRAGS/4];
-	#define IDX(l,i) l[i/4][i%4]
+	#define IDX(l,i) l[i>>2][i&3]
 	#else
 	int sortOp[MAX_FRAGS];
 	#define IDX(l,i) l[i]
@@ -73,6 +73,7 @@ void presortFrags()
 #endif
 
 #if PRESORT_REUSE
+
 void reuseSort(int fragIndex)
 {
 	ivec2 tileCoord = ivec2(gl_FragCoord.xy) / presortTileSize;
