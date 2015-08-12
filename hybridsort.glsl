@@ -340,12 +340,23 @@ void sortAndCompositeBlocks(int fragIndex)
 		++mergeCount;
 	}
 	
+	//prime the merge heads
 	int next[MERGE_SIZE];
 	for (int i = 0; i < MERGE_SIZE && i < mergeCount; ++i)
 	{
 		next[i] = min(fragCount, (i + 1) * MAX_REGISTERS) - 1;
 		registers[i] = FRAGS(next[i]);
 	}
+	
+	#if DEBUG
+	if (fragCount > MAX_FRAGS)
+	{
+		//warning: hit max frags!
+		fragColour = vec4(1,0,1,1);
+		return;
+	}
+	float lastDepth = 99999.0;
+	#endif
 	
 	//merge and composite blocks
 	fragColour = vec4(1.0);
@@ -370,6 +381,18 @@ void sortAndCompositeBlocks(int fragIndex)
 			if (n == j)
 				if (--next[j] >= j * MAX_REGISTERS)
 					registers[j] = FRAGS(next[j]);
+		
+		
+		#if DEBUG
+		float thisDepth = LFB_FRAG_DEPTH(f);
+		if (thisDepth > lastDepth)
+		{
+			//error: out of order!
+			fragColour = vec4(1,0,0,1);
+			return;
+		}
+		lastDepth = thisDepth;
+		#endif
 		
 		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
 		fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);
@@ -462,6 +485,16 @@ void sortAndCompositeBlocks(int fragIndex)
 		registers[i] = FRAGS(next[i]);
 	}
 	
+	#if DEBUG
+	if (fragCount == MAX_FRAGS)
+	{
+		//warning: hit max frags!
+		fragColour = vec4(1,0,1,1);
+		return;
+	}
+	float lastDepth = LFB_FRAG_DEPTH(FRAGS(fragCount-1));
+	#endif
+	
 	//merge and composite blocks
 	fragColour = vec4(1.0);
 	for (int i = 0; i < fragCount; ++i)
@@ -485,6 +518,17 @@ void sortAndCompositeBlocks(int fragIndex)
 			if (n == j)
 				if (--next[j] >= j * MAX_REGISTERS)
 					registers[j] = FRAGS(next[j]);
+		
+		#if DEBUG
+		float thisDepth = LFB_FRAG_DEPTH(f);
+		if (thisDepth > lastDepth)
+		{
+			//error: out of order!
+			fragColour = vec4(1,0,0,1);
+			return;
+		}
+		lastDepth = thisDepth;
+		#endif
 		
 		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
 		fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);

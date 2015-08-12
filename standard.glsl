@@ -33,10 +33,32 @@ void sortAndComposite(int fragIndex)
 	#endif
 	#endif
 	
+	#if DEBUG
+	if (fragCount > MAX_FRAGS)
+	{
+		//warning: hit max frags!
+		fragColour = vec4(1,0,1,1);
+		return;
+	}
+	float lastDepth = 9999.0;
+	#endif
+	
 	fragColour = vec4(1.0);
 	for (int i = fragCount-1; i >= 0; --i)
 	{
 		LFB_FRAG_TYPE f = FRAGS(i);
+		
+		#if DEBUG
+		float thisDepth = LFB_FRAG_DEPTH(FRAGS(i));
+		if (thisDepth > lastDepth)
+		{
+			//error: out of order!
+			fragColour = vec4(1,0,0,1);
+			return;
+		}
+		lastDepth = thisDepth;
+		#endif
+		
 		vec4 col = floatToRGBA8(f.x); //extract rgba from rg
 		//col.a = 0.1;
 		fragColour.rgb = mix(fragColour.rgb, col.rgb, col.a);

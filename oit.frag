@@ -7,6 +7,8 @@
 #define MAX_FRAGS MAX_FRAGS_OVERRIDE
 #endif
 
+#define DEBUG 0
+
 #define IS_BMA_SHADER (MAX_FRAGS_OVERRIDE != 0)
 
 //We read the linearized LFB in reverse order to make them match the linked list LFB order
@@ -92,7 +94,7 @@ void main()
 		#endif
 	#endif
 	
-	#if IS_BMA_SHADER && 1
+	#if IS_BMA_SHADER && DEBUG && 0
 	//fragColour.rgb = mix(fragColour.rgb, debugColLog(MAX_FRAGS), 0.25);
 	float dc = MAX_FRAGS_OVERRIDE/float(_MAX_FRAGS);
 	dc = sqrt(dc);

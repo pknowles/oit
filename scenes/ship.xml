@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<scene name="ship">
+	<mesh name="bottle"><file src="bottle.obj"/></mesh>
+	<mesh name="ship"><file src="galleon.obj"/></mesh>
+	<object mesh="bottle" resize-cover="0 9 0"/>
+	<object mesh="ship" position="0 1 1" resize-cover="0 7 0" rotation="0 1.5708 0"/>
+	<light position="30 30 -30 1" />
+	<view name="main">
+	-0.555933 0.527868 -0.429143
+	-0.479437 2.06285 0
+	11.0938
+	</view>
+	<view name="side" projection="orthographic" orth_size="16.0" near="-6.0" far="6.0">
+	0 0 0
+	0 1.5708 0
+	0
+	</view>
+</scene>
