@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <scene>
 	<mesh name="powerplant">
-		<file src="powerplant/powerplant.obj"/>
+		<file src="powerplant/powerplant.ctm"/>
 	</mesh>
 	<object mesh="powerplant" resize-cover="10 10 10"/>
 	<view name="front-dcpeak">

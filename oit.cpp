@@ -97,8 +97,9 @@ OIT::OIT()
 	optimizations.push_back(Optimization("REGISTERSORT", "Sort in Registers", this));
 	optimizations.push_back(Optimization("BSLMEM", "RBS from lmem", this));
 	optimizations.push_back(Optimization("BSGMEM", "RBS from gmem", this));
-	optimizations.push_back(Optimization("BSBASE", "BS in lmem", this));
+	optimizations.push_back(Optimization("BSBASE", "BS in lmem", this)); //same as RBS, but without fancy unrolling and registers
 	optimizations.push_back(Optimization("CUDA", "Basic CUDA", this));
+	optimizations.push_back(Optimization("NONE", "No LFB", this));
 	//optimizations.push_back(Optimization("SHAREDSORT", "Shared Sort Test", this));
 	
 	//STUPID PYAR!!! This comes FIRST!!!
@@ -167,13 +168,14 @@ void OIT::setMaxFrags(int frags)
 
 void OIT::renderToLFB(void (*scene)(Shader*), Shader* shader)
 {
+	bool direct = (*this)["NONE"];
 	if (profiler) profiler->start("Construct");
 	
 	//FIXME: potentially slow if changing every frame
 	setDefines(shader);
 	
 	//first pass
-	bool fullRender = lfb->begin();
+	bool fullRender = direct || lfb->begin();
 	Shader* firstRender = fullRender ? shader : &depthOnly;
 	firstRender->use();
 	CHECKERROR;
@@ -182,7 +184,7 @@ void OIT::renderToLFB(void (*scene)(Shader*), Shader* shader)
 	firstRender->unuse();
 	
 	//second pass, if needed
-	if (lfb->count())
+	if (!direct && lfb->count())
 	{
 		CHECKERROR;
 		shader->use();
@@ -369,6 +371,7 @@ void OIT::setDefines(Shader* shader)
 	shader->define("BLOCKSORT_GMEM", (*this)["BSGMEM"]);
 	shader->define("BLOCKSORT_BASE", (*this)["BSBASE"]);
 	shader->define("COMPOSITE_ONLY", (*this)["PASS"]);
+	shader->define("DIRECT_RENDER", (*this)["NONE"]);
 	
 	lfb->setDefines(*shader);
 }
@@ -497,6 +500,7 @@ bool OIT::optimizationSet(const std::string& id, bool enabled)
 
 void OIT::draw(void (*scene)(Shader*), Shader* shader)
 {
+	bool direct = (*this)["NONE"];
 	CHECKERROR;
 
 	if (shader->error() || shaderComposite->error())
@@ -513,7 +517,8 @@ void OIT::draw(void (*scene)(Shader*), Shader* shader)
 	renderToLFB(scene, shader);
 	
 	glDisable(GL_DEPTH_TEST);
-	compositeFromLFB();
+	if (!direct)
+		compositeFromLFB();
 }
 
 OIT::Optimization& OIT::operator[](int i)
