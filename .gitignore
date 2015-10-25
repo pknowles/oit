@@ -12,5 +12,12 @@ cuda/oit.module_id
 *.ptx
 *.cubin
 
+vs/ipch/
+vs/Debug*
+vs/Release*
+*.sdf
+*.opensdf
+
+.camera.txt
 config.cfg
 benchmark.csv
