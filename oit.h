@@ -70,7 +70,7 @@ public:
 	size_t getMemoryUsage(); //memory in GPU buffers only
 	void setProfiler(Profiler* p);
 	void draw(void (*scene)(Shader*), Shader* shader);
-	int getTotalFragments();
+	size_t getTotalFragments();
 	Optimization& operator[](int i);
 	Optimization& operator[](const std::string& i);
 	int numOptimizations();

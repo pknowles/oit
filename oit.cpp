@@ -104,7 +104,7 @@ OIT::OIT()
 	
 	//STUPID PYAR!!! This comes FIRST!!!
 	for (size_t i = 0; i < optimizations.size(); ++i)
-		optimizationIDs[optimizations[i].id] = i;
+		optimizationIDs[optimizations[i].id] = (int)i;
 	
 	(*this)["PACK"] = true;
 		
@@ -336,7 +336,7 @@ void OIT::compositeFromLFB()
 		if ((*this)["SHAREDSORT"])
 		{
 			shaderSharedSort->use();
-			shaderSharedSort->set("totalPixels", lfb->getTotalPixels());
+			shaderSharedSort->set("totalPixels", (int)lfb->getTotalPixels());
 			lfb->setUniforms(*shaderSharedSort, "lfb");
 			int i = 65000;
 			//glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_COUNT, &i);
@@ -523,7 +523,7 @@ void OIT::draw(void (*scene)(Shader*), Shader* shader)
 
 OIT::Optimization& OIT::operator[](int i)
 {
-	if (i < 0 || i > optimizations.size())
+	if (i < 0 || i > (int)optimizations.size())
 	{
 		static OIT::Optimization notfound;
 		return notfound;
@@ -546,7 +546,7 @@ int OIT::getMaxFrags()
 	return lfb->getMaxFrags();
 }
 
-int OIT::getTotalFragments()
+size_t OIT::getTotalFragments()
 {
 	return lfb->getTotalFragments();
 }
@@ -632,7 +632,7 @@ std::vector<vec2i> OIT::computeRasterPattern()
 	vec2i* p = (vec2i*)positions.map();
 	vec2i last = p[0];
 	BigStr str;
-	for (int i = 1; i < c; ++i)
+	for (unsigned int i = 1; i < c; ++i)
 	{
 		vec2i d = p[i] - last;
 		last = p[i];

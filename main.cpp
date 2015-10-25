@@ -308,7 +308,7 @@ void update(float dt)
 		std::string statusStr;
 		statusStr += oit.info();
 		statusStr += profiler.toString();
-		statusStr += "Frags: " + humanNumber(oit.getTotalFragments()) + "\n";
+		statusStr += "Frags: " + humanNumber((int)oit.getTotalFragments()) + "\n";
 		statusStr += format("Benchmark ETA: %.2fm\n", benchmark.expectedTimeToCompletion()/60.0f);
 		status = statusStr;
 	
@@ -348,7 +348,7 @@ void update(float dt)
 	{
 		benchmark.currentTest()->overrideOutput("memory", (int)(oit.getMemoryUsage()));
 		benchmark.currentTest()->overrideOutput("tmemory", (int)(getGPUMemoryUsage()));
-		benchmark.currentTest()->overrideOutput("fragments", oit.getTotalFragments());
+		benchmark.currentTest()->overrideOutput("fragments", (int)oit.getTotalFragments());
 	}
 	
 	if (jeltz.buttonDown("F3"))
@@ -547,7 +547,7 @@ void display()
 				int n = -1;
 				for (size_t i = 0; i < positions.size(); ++i)
 					if (positions[i] == vec2i(x, y))
-						n = i;
+						n = (int)i;
 				printf("%02i ", n);
 			}
 			printf("\n");
