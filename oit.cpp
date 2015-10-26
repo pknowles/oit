@@ -509,7 +509,8 @@ void OIT::draw(void (*scene)(Shader*), Shader* shader)
 	vec4i vp;
 	glGetIntegerv(GL_VIEWPORT, (GLint*)&vp);
 	if (lfb->resize(vp.zw()))
-		dirtyShaders = true;
+		//FIXME: why the hell is this here?? I don't need to redefine anything when the window resizes
+		; //dirtyShaders = true;
 	
 	if (dirtyShaders)
 		updateShaders();
