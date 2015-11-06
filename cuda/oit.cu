@@ -39,10 +39,10 @@ __device__ float4 floatToRGBA8(float x)
 	tmp.f = x;
 	unsigned int i = tmp.i;
 	return make_float4(
-		((float)(i>>24))/255.0f,
-		((float)((i>>16)&0xFF))/255.0f,
+		((float)(i & 0xFF))/255.0f,
 		((float)((i>>8)&0xFF))/255.0f,
-		((float)(i & 0xFF))/255.0f
+		((float)((i>>16)&0xFF))/255.0f,
+		((float)(i>>24))/255.0f
 		);
 }
 
@@ -833,7 +833,7 @@ bool compositeLinkedLists(int heads, int nexts, int data, int outBufferTexture, 
 
 bool compositeLinearizedShared(int offsets, int data, int outBufferTexture, int pixels, int maxFrags)
 {
-	int stride = 2;
+	//int stride = 2;
 	unsigned int* offsetsPtr = (unsigned int*)CUDAGLBuffer::get[offsets];
 	float* dataPtr = (float*)CUDAGLBuffer::get[data];
 	uchar4* framebuffer = (uchar4*)CUDAGLBuffer::get[outBufferTexture];
@@ -842,11 +842,11 @@ bool compositeLinearizedShared(int offsets, int data, int outBufferTexture, int 
 	dim3 grid(ceil(pixels, tpb), 1, 1);
 	dim3 block(tpb, 1, 1);
 	
-	int shared = sizeof(float2) * tpb;
 	
 	bool success = true;
 	
 	/*
+	int shared = sizeof(float2) * tpb;
 	switch (maxFrags)
 	{
 	case 8: kernelLinearizedParallelSpawner<8, tpb><<<grid,block,shared>>>(offsetsPtr, dataPtr, framebuffer, stride, pixels); break;

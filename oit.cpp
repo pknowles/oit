@@ -174,6 +174,9 @@ void OIT::renderToLFB(void (*scene)(Shader*), Shader* shader)
 	//FIXME: potentially slow if changing every frame
 	setDefines(shader);
 	
+	if (direct)
+		glEnable(GL_DEPTH_TEST);
+	
 	//first pass
 	bool fullRender = direct || lfb->begin();
 	Shader* firstRender = fullRender ? shader : &depthOnly;
@@ -338,7 +341,7 @@ void OIT::compositeFromLFB()
 			shaderSharedSort->use();
 			shaderSharedSort->set("totalPixels", (int)lfb->getTotalPixels());
 			lfb->setUniforms(*shaderSharedSort, "lfb");
-			int i = 65000;
+			//int i = 65000;
 			//glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_COUNT, &i);
 			//glDispatchCompute(mymin(i, ceil(lfb->getTotalPixels(),8)), 1, 1);
 			CHECKERROR;
@@ -428,8 +431,8 @@ void OIT::updateShaders()
 	bmaIntervals.resize(intervalsNeeded);
 	
 	//update defines
-	for (size_t i = 0; i < bmaIntervals.size(); ++i)
-		setDefines(bmaIntervals[i].shader);
+	for (size_t j = 0; j < bmaIntervals.size(); ++j)
+		setDefines(bmaIntervals[j].shader);
 	setDefines(shaderPresort);
 	setDefines(shaderReuse);
 	setDefines(shaderComposite);
@@ -509,8 +512,10 @@ void OIT::draw(void (*scene)(Shader*), Shader* shader)
 	vec4i vp;
 	glGetIntegerv(GL_VIEWPORT, (GLint*)&vp);
 	if (lfb->resize(vp.zw()))
+	{
 		//FIXME: why the hell is this here?? I don't need to redefine anything when the window resizes
-		; //dirtyShaders = true;
+		//dirtyShaders = true;
+	}
 	
 	if (dirtyShaders)
 		updateShaders();

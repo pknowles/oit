@@ -327,7 +327,7 @@ void update(float dt)
 				hfile << i << "," << h[i] << std::endl;
 			hfile.close();
 			printf("Max DC: %i\n", (int)(h.size()-1));
-			printf("Frags: %i\n", oit.getTotalFragments());
+			printf("Frags: %zu\n", oit.getTotalFragments());
 		}
 		else
 			printf("ERROR: No counts for histogram\n");
@@ -466,7 +466,7 @@ void display()
 	rtt.bind();
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (currentScene)
 		oit.draw(currentScene, &phong);
 	rtt.unbind();
@@ -759,6 +759,7 @@ int main(int argc, char* argv[])
 	
 	rtt.colour[0] = new Texture2D(vec2i(0), GL_RGBA8);
 	rtt.stencil = new Texture2D(vec2i(0), GL_DEPTH24_STENCIL8);
+	rtt.depth = rtt.stencil;
 	
 	currentScene = drawScene;
 	//currentScene = drawQuads;

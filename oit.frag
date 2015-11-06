@@ -94,7 +94,7 @@ void main()
 		#endif
 	#endif
 	
-	#if IS_BMA_SHADER && DEBUG && 0
+	#if IS_BMA_SHADER
 	//fragColour.rgb = mix(fragColour.rgb, debugColLog(MAX_FRAGS), 0.25);
 	float dc = MAX_FRAGS_OVERRIDE/float(_MAX_FRAGS);
 	dc = sqrt(dc);

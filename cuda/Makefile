@@ -93,7 +93,8 @@ pyarlibpyarliba:
 	
 %.o : %.cu
 	@echo compiling \(CUDA\) $@ $(CFLAGS_R)
-	PATH="$(CUDA_HOME)/bin/:${PATH}" && $(NVCC) $(CFLAGS) $(NV_CFLAGS) --keep -dc -Xptxas="-v" -c $< -o $@
+	#PATH="$(CUDA_HOME)/bin/:${PATH}" && $(NVCC) $(CFLAGS) $(NV_CFLAGS) --keep -dc -Xptxas="-v" -c $< -o $@
+	$(NVCC) $(CFLAGS) $(NV_CFLAGS) -dc -c $< -o $@
 
 #precompiled header
 
