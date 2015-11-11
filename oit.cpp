@@ -385,6 +385,14 @@ void OIT::updateShaders()
 	fflush(stdout);
 
 	dirtyShaders = false;
+	
+	#if !NO_CUDA
+	if ((*this)["CUDA"])
+	{
+		OIT_CUDA* oitCUDA = getOIT_CUDA();
+		oitCUDA->setDirty();
+	}
+	#endif
 
 	//update BMA shaders
 	int maxBMAInterval = 0;

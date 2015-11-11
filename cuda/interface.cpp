@@ -19,6 +19,7 @@ OIT_CUDA* getOIT_CUDA()
 
 OIT_CUDA::OIT_CUDA()
 {
+	isDirty = true;
 	mergesort = false;
 	error = false;
 	init();
@@ -64,8 +65,11 @@ bool OIT_CUDA::sortAndComposite(LFB* lfb, GPUBuffer* outBufferTexture)
 		bufferChecks[3] = outBufferTexture->placementID;
 	}
 	
-	if (needRefresh)
+	if (isDirty || needRefresh)
+	{
+		isDirty = false;
 		refreshCUDABuffers();
+	}
 	
 	bool ok = false;
 	if (lfbL)
@@ -81,3 +85,7 @@ bool OIT_CUDA::sortAndComposite(LFB* lfb, GPUBuffer* outBufferTexture)
 	return ok;
 }
 
+void OIT_CUDA::setDirty()
+{
+	isDirty = true;
+}

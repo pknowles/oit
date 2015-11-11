@@ -28,12 +28,14 @@ class OIT_CUDA
 	friend struct pyarlib::on_demand<OIT_CUDA>;
 	OIT_CUDA();
 	bool error;
+	bool isDirty; //if CUDA buffer mapping needs to be redone
 	void init();
 public:
 	virtual ~OIT_CUDA();
 	bool mergesort;
 	bool registersort;
 	bool sortAndComposite(LFB* lfb, GPUBuffer* outBufferTexture); //returns false on error
+	void setDirty();
 };
 
 #endif
