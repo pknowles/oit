@@ -62,6 +62,7 @@ const char* sceneFiles[] = {
 	"scenes/tree.xml",
 	"scenes/planes2.xml",
 	"scenes/ship.xml",
+	"scenes/spheres.xml",
 	};
 
 bool directionalLight = true;
@@ -615,7 +616,8 @@ int main(int argc, char* argv[])
 	
 	scene.forceDoubleSided = true;
 	scene.setCamera(&fly.camera);
-	scene.load(sceneFiles[1]);
+	if (!scene.load(sceneFiles[1])) //try the atrium
+		scene.load(sceneFiles[7]); //else load some spheres
 	scene.enableLighting(false);
 	viewSlider.i = 0;
 	viewSlider.upper = mymax(0, scene.getNumViews() - 1);
